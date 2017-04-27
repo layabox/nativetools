@@ -96,8 +96,9 @@ exports.handler = function (argv) {
   if (!cmd.check(argv, nativeJSON)) {
     return;
   }
+
   if (!nativeJSON){
-    nativeJSON = {h5:folder,native:'./' + argv.name};
+    nativeJSON = {h5:path.relative(nativeJSONPath,folder),native:'./' + argv.name};
   }
 
   if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {

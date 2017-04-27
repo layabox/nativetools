@@ -18,35 +18,7 @@ export class AppCommand {
 
     constructor() {
     }
-    public excuteRefreshApp(folder: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON:any) {
-        var me = this;
-        let appPath = this.getAppPath(name, platform, nativeJSON);
-        //读取配置
-
-        let configPath = path.join(appPath, "config.json");
-        if (!fs.existsSync(configPath)) {
-            console.log('Error: can not find ' + configPath);
-            return;
-        }
-        let config = fs_extra.readJSONSync(configPath);
-        if (!config) {
-            console.log('Error: read ' + configPath + 'failed.');
-            return;
-        }
-
-        this.processUrl(config, type, url, appPath);
-        this.processPackageName(config, package_name, appPath);
-        this.processDcc(config, folder, url, appPath);
-        this.processName(config, name, appPath);
-
-        nativeJSON.type = type;
-        nativeJSON.url = type == 2 ? STAND_ALONE_URL : url;
-        nativeJSON.name = name;
-        nativeJSON.app_name = app_name;
-        nativeJSON.package_name = package_name;
-        fs_extra.writeJSONSync(this.getNativeJSONPath(),nativeJSON);
-    }
-    public excuteCreateApp(folder: string, SDKPath: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON:any) {
+    public excuteCreateApp(folder: string, SDKPath: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON:any):boolean {
         var me = this;
         let appPath = this.getAppPath(name, platform, nativeJSON);
         //读取配置
@@ -54,17 +26,17 @@ export class AppCommand {
         let configPath = path.join(SDKPath, "config.json");
         if (!fs.existsSync(configPath)) {
             console.log('Error: can not find ' + configPath);
-            return;
+            return false;
         }
         let config = fs_extra.readJSONSync(configPath);
         if (!config) {
             console.log('Error: read ' + configPath + 'failed.');
-            return;
+            return false;
         }
         //判读项目是否已存在
         if (fs.existsSync(appPath)) {
             console.log("同名文件 " + appPath + " 已经存在");
-            return;
+            return false;
         }
         
         //拷贝
@@ -73,12 +45,10 @@ export class AppCommand {
             var destPath = path.join(appPath, source);
             if (fs.existsSync(destPath)) {
                 console.log("发现同名文件，请选择其他输出目录");
-                //TODO 删除
-                return;
+                return false;
             }
             fs_extra.copySync(srcPath, destPath);
         });
-        fs_extra.copySync(configPath, path.join(this.getAppPath(name, platform, nativeJSON), "config.json"));//TODO TEST
 
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
@@ -91,6 +61,8 @@ export class AppCommand {
         nativeJSON.app_name = app_name;
         nativeJSON.package_name = package_name;
         fs_extra.writeJSONSync(this.getNativeJSONPath(),nativeJSON);
+
+        return true;
     }
     public check(argv:any, nativeJSON:any):boolean {
         if (!argv.type) {
@@ -242,8 +214,8 @@ export class AppCommand {
         console.log('name: ' + name);
     }
     public getAppPath(name: string, platform: string, nativeJSON:any): string {
-        if (nativeJSON && nativeJSON.dir){
-            return path.join(path.join(process.cwd(), nativeJSON.dir), platform);
+        if (nativeJSON && nativeJSON.native){
+            return path.join(path.join(process.cwd(), nativeJSON.native), platform);
         }
         return path.join(path.join(process.cwd(), name), platform);
     }

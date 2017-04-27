@@ -81,16 +81,57 @@ exports.handler = function (argv) {
   if (!fs.existsSync(folder)){
     console.log('Error: not find ' + folder);
   }
+
   let app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_IOS, nativeJSON);
   if (fs.existsSync(app)){
-    cmd.excuteRefreshApp(folder,AppCommand.PLATFORM_IOS,argv.type,argv.url,argv.name,argv.app_name,argv.package_name,nativeJSON);
+    //let tempPath = fs.mkdtempSync(AppCommand.PLATFORM_IOS);
+    let date = new Date;
+    let tempPath = app + String(date.getTime());
+    fs.rename(app,tempPath);
+
+    let sdk = cmd.getSDKPath(AppCommand.PLATFORM_IOS);
+    console.log('platform: ' + AppCommand.PLATFORM_IOS);
+    console.log('sdk: ' + sdk);
+    if (cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)){
+      fs_extra.removeSync(tempPath);
+    }
+    else{
+      fs.renameSync(tempPath,app);
+    }
   }
+
+
   app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_ECLIPSE, nativeJSON);
   if (fs.existsSync(app)){
-    cmd.excuteRefreshApp(folder,AppCommand.PLATFORM_ANDROID_ECLIPSE,argv.type,argv.url,argv.name,argv.app_name,argv.package_name,nativeJSON);
+    let date = new Date;
+    let tempPath = app + String(date.getTime());
+    fs.rename(app,tempPath);
+
+    let sdk = cmd.getSDKPath(AppCommand.PLATFORM_ANDROID_ECLIPSE);
+    console.log('platform: ' + AppCommand.PLATFORM_ANDROID_ECLIPSE);
+    console.log('sdk: ' + sdk);
+    if (cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)){
+      fs_extra.removeSync(tempPath);
+    }
+    else{
+      fs.renameSync(tempPath,app);
+    }
   }
-   app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_STUDIO, nativeJSON);
+
+  app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_STUDIO, nativeJSON);
   if (fs.existsSync(app)){
-    cmd.excuteRefreshApp(folder,AppCommand.PLATFORM_ANDROID_STUDIO,argv.type,argv.url,argv.name,argv.app_name,argv.package_name,nativeJSON);
+    let date = new Date;
+    let tempPath = app + String(date.getTime());
+    fs.rename(app,tempPath);
+
+    let sdk = cmd.getSDKPath(AppCommand.PLATFORM_ANDROID_STUDIO);
+    console.log('platform: ' + AppCommand.PLATFORM_ANDROID_STUDIO);
+    console.log('sdk: ' + sdk);
+    if (cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)){
+      fs_extra.removeSync(tempPath);
+    }
+    else{
+      fs.renameSync(tempPath,app);
+    }
   }
 }
