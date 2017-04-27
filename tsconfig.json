@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "noImplicitAny": false,
+        "rootDir": ".",
+        "removeComments": true,
+        "sourceMap": false,
+        "outDir": "out"
+    }
+}
