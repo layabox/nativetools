@@ -1,0 +1,22 @@
+{
+  "name": "nativetools",
+  "version": "1.0.0",
+  "description": "laya native tools",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/layabox/nativetools.git"
+  },
+  "keywords": [
+    "laya"
+  ],
+  "author": "lv",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/layabox/nativetools/issues"
+  },
+  "homepage": "https://github.com/layabox/nativetools#readme"
+}
