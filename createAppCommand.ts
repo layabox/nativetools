@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import fs_extra = require('fs-extra');
 
+import * as req from 'request';//
 
 exports.command = 'create_app [options]'
 exports.describe = '创建app项目'
