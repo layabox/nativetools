@@ -21,13 +21,13 @@ export class AppCommand {
     }
     public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON: any): boolean {
         console.log('platform: ' + platform);
-        console.log('sdk: ' + path.join(sdk,platform));
+        console.log('sdk: ' + path.join(sdk, platform));
 
         var me = this;
         let appPath = this.getAppPath(name, platform, nativeJSON);
         //读取配置
 
-        let configPath = path.join(path.join(sdk,platform), "config.json");
+        let configPath = path.join(path.join(sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
             console.log('Error: can not find ' + configPath);
             return false;
@@ -45,7 +45,7 @@ export class AppCommand {
 
         //拷贝
         config["template"]["source"].forEach(function (source) {
-            var srcPath = path.join(path.join(sdk,platform), source);
+            var srcPath = path.join(path.join(sdk, platform), source);
             var destPath = path.join(appPath, source);
             if (fs.existsSync(destPath)) {
                 console.log("发现同名文件，请选择其他输出目录");
@@ -64,7 +64,7 @@ export class AppCommand {
         nativeJSON.name = name;
         nativeJSON.app_name = app_name;
         nativeJSON.package_name = package_name;
-       
+
         fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
 
         return true;
@@ -240,11 +240,14 @@ export class AppCommand {
         }
         return folder;//不是H5项目目录，直接认为是bin目录
     }
-    public getSDKPath(version:string): string {
-        return path.join(__dirname, '../template/',version);
+    public getSDKRootPath(): string {
+        return path.join(__dirname, '../template/');
     }
-    public isSDKExists(version:string):boolean{
-        return fs.existsSync(path.join(__dirname, '../template/',version));
+    public getSDKPath(version: string): string {
+        return path.join(__dirname, '../template/', version);
+    }
+    public isSDKExists(version: string): boolean {
+        return fs.existsSync(path.join(__dirname, '../template/', version));
     }
     private read(path: string): string {
         try {
@@ -264,9 +267,27 @@ export async function getServerJSONConfig(url: string): Promise<any> {
                 res(JSON.parse(body));
             }
             else {
-                console.log("download " + url + ' error ');
+                console.log('Error: ' + response.statusCode + ' download ' + url + ' error.');
                 res(null);
             }
         })
     });
+}
+export async function download(url: string, file: string, callBack: () =>void): Promise<boolean> {
+    return new Promise<any>(function (res, rej) {
+        let stream = fs.createWriteStream(file);
+        let layaresponse;
+        request(url).on('response', function (response) {
+            layaresponse = response;
+        }).pipe(stream).on('close', function () {
+            if (layaresponse.statusCode === 200) {
+                callBack();
+                res(true);
+            }
+            else {
+                console.log('Error: ' + layaresponse.statusCode + ' download ' + url + ' error.');
+                res(false);
+            }
+        });
+    })
 }

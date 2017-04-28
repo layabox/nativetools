@@ -110,21 +110,24 @@ exports.handler = async function (argv) {
     sdk = argv.sdk;
   }
   else {
-    let sdkVersionConfig = await AppCommand.getServerJSONConfig("http://10.10.20.102:9999/versionconfig.json?" + Math.random());
+    let sdkVersionConfig = await AppCommand.getServerJSONConfig("http://10.10.20.102:9999/versionconfig.json?" + Math.random());//TODO
     if (!sdkVersionConfig) {
       return;
     }
 
     if (!argv.sdk && !argv.version) {
-      if (!cmd.isSDKExists(sdkVersionConfig.versionList[0])){//最新版
-        //download
-        sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0]);
+      if (!cmd.isSDKExists(sdkVersionConfig.versionList[0].version)){//最新版
+        let zip = path.join(cmd.getSDKRootPath(),path.basename(sdkVersionConfig.versionList[0].url));
+        await AppCommand.download(sdkVersionConfig.versionList[0].url,zip,function(){
+          
+        });//download
+        sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
       }
     }
     else {
       let found = false;
       for (let i = 0; i < sdkVersionConfig.versionList.length; i++) {
-        if (sdkVersionConfig.versionList[i] === argv.version) {
+        if (sdkVersionConfig.versionList[i].version === argv.version) {
           found = true;
         }
       }
