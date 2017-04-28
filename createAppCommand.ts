@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import fs_extra = require('fs-extra');
 
-import * as req from 'request';//
+import * as request from 'request';
 
 exports.command = 'create_app [options]'
 exports.describe = '创建app项目'
@@ -22,6 +22,13 @@ exports.builder = {
     required: false,
     requiresArg: true,
     description: 'SDK本地目录，不是必选'
+  },
+  version:
+  {
+    alias: 'v',
+    required: false,
+    requiresArg: true,
+    description: 'SDK版本，不是必选'
   },
   platform:
   {
@@ -74,7 +81,7 @@ exports.builder = {
   }
 }
 
-exports.handler = function (argv) {
+exports.handler = async function (argv) {
   let cmd = new AppCommand.AppCommand();
   let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
   console.log('folder: ' + folder);
@@ -83,14 +90,52 @@ exports.handler = function (argv) {
   let nativeJSONPath = cmd.getNativeJSONPath();
   if (fs.existsSync(nativeJSONPath)) {
     nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
-    if (!nativeJSON){
+    if (!nativeJSON) {
       console.log('Error: open ' + nativeJSONPath + ' error.');
       return;
     }
     console.log(nativeJSON.native);//debug
-    if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))){
+    if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))) {
       console.log('Error: missing ' + nativeJSON.native + ' error.');
-      return; 
+      return;
+    }
+  }
+
+  let sdk;
+  if (argv.sdk && argv.version) {
+    console.log('--sdk and --version can only choose one of the two');
+    return;
+  }
+  else if (argv.sdk) {
+    sdk = argv.sdk;
+  }
+  else {
+    let sdkVersionConfig = await AppCommand.getServerJSONConfig("http://10.10.20.102:9999/versionconfig.json?" + Math.random());
+    if (!sdkVersionConfig) {
+      return;
+    }
+
+    if (!argv.sdk && !argv.version) {
+      if (!cmd.isSDKExists(sdkVersionConfig.versionList[0])){//最新版
+        //download
+        sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0]);
+      }
+    }
+    else {
+      let found = false;
+      for (let i = 0; i < sdkVersionConfig.versionList.length; i++) {
+        if (sdkVersionConfig.versionList[i] === argv.version) {
+          found = true;
+        }
+      }
+      if (!found) {
+        console.log('Invalid version not found');
+        return;
+      }
+      if (!cmd.isSDKExists(argv.version)){
+        //download
+        sdk = cmd.getSDKPath(argv.version);
+      }
     }
   }
 
@@ -98,31 +143,19 @@ exports.handler = function (argv) {
     return;
   }
 
-  if (!nativeJSON){
-    nativeJSON = {h5:path.relative(nativeJSONPath,folder),native:'./' + argv.name};
+  if (!nativeJSON) {
+    nativeJSON = { h5: path.relative(nativeJSONPath, folder), native: './' + argv.name };
   }
 
   if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
-    let sdk = cmd.getSDKPath(AppCommand.PLATFORM_IOS);//TODO delete
-    console.log('platform: ' + AppCommand.PLATFORM_IOS);
-    console.log('sdk: ' + sdk);
+    nativeJSON.sdk = sdk;
     cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
-
-    argv.sdk = cmd.getSDKPath(AppCommand.PLATFORM_ANDROID_ECLIPSE);//TODO delete
-    console.log('platform: ' + AppCommand.PLATFORM_ANDROID_ECLIPSE);
-    console.log('sdk: ' + argv.sdk);
-    cmd.excuteCreateApp(folder, argv.sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
-
-    argv.sdk = cmd.getSDKPath(AppCommand.PLATFORM_ANDROID_STUDIO);//TODO delete
-    console.log('platform: ' + AppCommand.PLATFORM_ANDROID_STUDIO);
-    console.log('sdk: ' + argv.sdk);
-    cmd.excuteCreateApp(folder, argv.sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+    cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+    cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
   }
   else {
-    argv.sdk = cmd.getSDKPath(argv.platform);//TODO delete
-    console.log('platform: ' + argv.platform);
-    console.log('sdk: ' + argv.sdk);
-    cmd.excuteCreateApp(folder, argv.sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+    nativeJSON.sdk = sdk;
+    cmd.excuteCreateApp(folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
   }
 }
 

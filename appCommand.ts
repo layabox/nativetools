@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import fs_extra = require('fs-extra');
 import gen_dcc = require('layadcc');
+import * as request from 'request';
 
 export const STAND_ALONE_URL: string = 'http://stand.alone.version/index.html';
 export const DEFAULT_NAME: string = 'LayaBox';
@@ -18,12 +19,15 @@ export class AppCommand {
 
     constructor() {
     }
-    public excuteCreateApp(folder: string, SDKPath: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON:any):boolean {
+    public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON: any): boolean {
+        console.log('platform: ' + platform);
+        console.log('sdk: ' + path.join(sdk,platform));
+
         var me = this;
         let appPath = this.getAppPath(name, platform, nativeJSON);
         //读取配置
 
-        let configPath = path.join(SDKPath, "config.json");
+        let configPath = path.join(path.join(sdk,platform), "config.json");
         if (!fs.existsSync(configPath)) {
             console.log('Error: can not find ' + configPath);
             return false;
@@ -38,10 +42,10 @@ export class AppCommand {
             console.log("同名文件 " + appPath + " 已经存在");
             return false;
         }
-        
+
         //拷贝
         config["template"]["source"].forEach(function (source) {
-            var srcPath = path.join(SDKPath, source);
+            var srcPath = path.join(path.join(sdk,platform), source);
             var destPath = path.join(appPath, source);
             if (fs.existsSync(destPath)) {
                 console.log("发现同名文件，请选择其他输出目录");
@@ -60,11 +64,12 @@ export class AppCommand {
         nativeJSON.name = name;
         nativeJSON.app_name = app_name;
         nativeJSON.package_name = package_name;
-        fs_extra.writeJSONSync(this.getNativeJSONPath(),nativeJSON);
+       
+        fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
 
         return true;
     }
-    public check(argv:any, nativeJSON:any):boolean {
+    public check(argv: any, nativeJSON: any): boolean {
         if (!argv.type) {
             if (nativeJSON && nativeJSON.type) {
                 argv.type = nativeJSON.type;
@@ -213,8 +218,8 @@ export class AppCommand {
         });
         console.log('name: ' + name);
     }
-    public getAppPath(name: string, platform: string, nativeJSON:any): string {
-        if (nativeJSON && nativeJSON.native){
+    public getAppPath(name: string, platform: string, nativeJSON: any): string {
+        if (nativeJSON && nativeJSON.native) {
             return path.join(path.join(process.cwd(), nativeJSON.native), platform);
         }
         return path.join(path.join(process.cwd(), name), platform);
@@ -235,8 +240,11 @@ export class AppCommand {
         }
         return folder;//不是H5项目目录，直接认为是bin目录
     }
-    public getSDKPath(platform: string): string {
-        return path.join(__dirname, '../template/' + platform);
+    public getSDKPath(version:string): string {
+        return path.join(__dirname, '../template/',version);
+    }
+    public isSDKExists(version:string):boolean{
+        return fs.existsSync(path.join(__dirname, '../template/',version));
     }
     private read(path: string): string {
         try {
@@ -248,4 +256,17 @@ export class AppCommand {
         }
         return text;
     }
+}
+export async function getServerJSONConfig(url: string): Promise<any> {
+    return new Promise<any>(function (res, rej) {
+        request(url, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                res(JSON.parse(body));
+            }
+            else {
+                console.log("download " + url + ' error ');
+                res(null);
+            }
+        })
+    });
 }

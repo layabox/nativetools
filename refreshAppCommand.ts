@@ -74,7 +74,7 @@ exports.handler = function (argv) {
     return;
   }
 
-  if (!nativeJSON || !nativeJSON.h5 || nativeJSON.h5 === ''){
+  if (!nativeJSON || !nativeJSON.h5 || nativeJSON.h5 === '' || nativeJSON.sdk){
       console.log('Error: ' + nativeJSONPath + ' invalid.');
   }
   let folder = path.join(process.cwd(), nativeJSON.h5);
@@ -88,11 +88,7 @@ exports.handler = function (argv) {
     let date = new Date;
     let tempPath = app + String(date.getTime());
     fs.rename(app,tempPath);
-
-    let sdk = cmd.getSDKPath(AppCommand.PLATFORM_IOS);
-    console.log('platform: ' + AppCommand.PLATFORM_IOS);
-    console.log('sdk: ' + sdk);
-    if (cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)){
+    if (cmd.excuteCreateApp(folder, nativeJSON.sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)){
       fs_extra.removeSync(tempPath);
     }
     else{
@@ -100,17 +96,12 @@ exports.handler = function (argv) {
     }
   }
 
-
   app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_ECLIPSE, nativeJSON);
   if (fs.existsSync(app)){
     let date = new Date;
     let tempPath = app + String(date.getTime());
     fs.rename(app,tempPath);
-
-    let sdk = cmd.getSDKPath(AppCommand.PLATFORM_ANDROID_ECLIPSE);
-    console.log('platform: ' + AppCommand.PLATFORM_ANDROID_ECLIPSE);
-    console.log('sdk: ' + sdk);
-    if (cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)){
+    if (cmd.excuteCreateApp(folder, nativeJSON.sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)){
       fs_extra.removeSync(tempPath);
     }
     else{
@@ -123,11 +114,7 @@ exports.handler = function (argv) {
     let date = new Date;
     let tempPath = app + String(date.getTime());
     fs.rename(app,tempPath);
-
-    let sdk = cmd.getSDKPath(AppCommand.PLATFORM_ANDROID_STUDIO);
-    console.log('platform: ' + AppCommand.PLATFORM_ANDROID_STUDIO);
-    console.log('sdk: ' + sdk);
-    if (cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)){
+    if (cmd.excuteCreateApp(folder, nativeJSON.sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)){
       fs_extra.removeSync(tempPath);
     }
     else{
