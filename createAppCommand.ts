@@ -82,98 +82,106 @@ exports.builder = {
 }
 
 exports.handler = async function (argv) {
-  let cmd = new AppCommand.AppCommand();
-  let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
-  console.log('folder: ' + folder);
+  try {
+    let cmd = new AppCommand.AppCommand();
+    let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
+    console.log('folder: ' + folder);
 
-  let nativeJSON = null;
-  let nativeJSONPath = cmd.getNativeJSONPath();
-  if (fs.existsSync(nativeJSONPath)) {
-    nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
-    if (!nativeJSON) {
-      console.log('Error: open ' + nativeJSONPath + ' error.');
-      return;
-    }
-    console.log(nativeJSON.native);//debug
-    if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))) {
-      console.log('Error: missing ' + nativeJSON.native + ' error.');
-      return;
-    }
-  }
-
-  let sdk;
-  if (argv.sdk && argv.version) {
-    console.log('--sdk and --version can only choose one of the two');
-    return;
-  }
-  else if (argv.sdk) {
-    sdk = argv.sdk;
-  }
-  else {
-    let sdkVersionConfig = await AppCommand.getServerJSONConfig(AppCommand.VERSION_CONFIG_URL + '?' + Math.random());
-    if (!sdkVersionConfig) {
-      return;
-    }
-
-    if (!argv.sdk && !argv.version) {
-      if (!cmd.isSDKExists(sdkVersionConfig.versionList[0].version)){//最新版
-        let zip = path.join(cmd.getSDKRootPath(),path.basename(sdkVersionConfig.versionList[0].url));
-        await AppCommand.download(sdkVersionConfig.versionList[0].url,zip,function(){
-          AppCommand.unzip(zip,path.dirname(zip),function(error: Error, stdout: string, stderr: string){
-            if (error){
-              console.log(error.name);
-              console.log(error.message);
-              console.log(error.stack);
-            }
-          });
-        });//download
-        sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
-      }
-    }
-    else {
-      let found = false;
-      for (let i = 0; i < sdkVersionConfig.versionList.length; i++) {
-        if (sdkVersionConfig.versionList[i].version === argv.version) {
-          found = true;
-        }
-      }
-      if (!found) {
-        console.log('Invalid version not found');
+    let nativeJSON = null;
+    let nativeJSONPath = cmd.getNativeJSONPath();
+    if (fs.existsSync(nativeJSONPath)) {
+      nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
+      if (!nativeJSON) {
+        console.log('Error: open ' + nativeJSONPath + ' error.');
         return;
       }
-      if (!cmd.isSDKExists(argv.version)){
-        let zip = path.join(cmd.getSDKRootPath(),path.basename(sdkVersionConfig.versionList[0].url));
-        await AppCommand.download(sdkVersionConfig.versionList[0].url,zip,function(){
-          AppCommand.unzip(zip,path.dirname(zip),function(error: Error, stdout: string, stderr: string){
-            if (error){
-              console.log(error.name);
-              console.log(error.message);
-              console.log(error.stack);
-            }
+      console.log(nativeJSON.native);//debug
+      if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))) {
+        console.log('Error: missing ' + nativeJSON.native + ' error.');
+        return;
+      }
+    }
+
+    let sdk;
+    if (argv.sdk && argv.version) {
+      console.log('--sdk and --version can only choose one of the two');
+      return;
+    }
+    else if (argv.sdk) {
+      sdk = argv.sdk;
+    }
+    else {
+      let sdkVersionConfig = await AppCommand.getServerJSONConfig(AppCommand.VERSION_CONFIG_URL + '?' + Math.random());
+      if (!sdkVersionConfig) {
+        return;
+      }
+
+      if (!argv.sdk && !argv.version) {
+        if (!cmd.isSDKExists(sdkVersionConfig.versionList[0].version)) {//最新版 
+          let zip = path.join(cmd.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[0].url));
+          await AppCommand.download(sdkVersionConfig.versionList[0].url, zip, function () {
+            AppCommand.unzip(zip, path.dirname(zip), function (error: Error, stdout: string, stderr: string) {
+              if (error) {
+                console.log(error.name);
+                console.log(error.message);
+                console.log(error.stack);
+              }
+            });
           });
-        });//download
+        }
+         sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
+      }
+      else {
+        let found = false;
+        let index;
+        for (let i = 0; i < sdkVersionConfig.versionList.length; i++) {
+          if (sdkVersionConfig.versionList[i].version === argv.version) {
+            found = true;
+            index = i;
+            break;
+          }
+        }
+        if (!found) {
+          console.log('Invalid version ' + argv.version + ' not found');
+          return;
+        }
+        if (!cmd.isSDKExists(argv.version)) {
+          let zip = path.join(cmd.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[index].url));
+          await AppCommand.download(sdkVersionConfig.versionList[index].url, zip, function () {
+            AppCommand.unzip(zip, path.dirname(zip), function (error: Error, stdout: string, stderr: string) {
+              if (error) {
+                console.log(error.name);
+                console.log(error.message);
+                console.log(error.stack);
+              }
+            });
+          });
+        }
         sdk = cmd.getSDKPath(argv.version);
       }
     }
-  }
 
-  if (!cmd.check(argv, nativeJSON)) {
-    return;
-  }
+    if (!cmd.check(argv, nativeJSON)) {
+      return;
+    }
 
-  if (!nativeJSON) {
-    nativeJSON = { h5: path.relative(nativeJSONPath, folder), native: './' + argv.name };
-  }
+    if (!nativeJSON) {
+      nativeJSON = { h5: path.relative(path.dirname(nativeJSONPath), folder), native: argv.name };
+    }
 
-  if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
-    nativeJSON.sdk = sdk;
-    cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
-    cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
-    cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+    if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
+      nativeJSON.sdk = sdk;
+      cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+      cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+      cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+    }
+    else {
+      nativeJSON.sdk = sdk;
+      cmd.excuteCreateApp(folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+    }
   }
-  else {
-    nativeJSON.sdk = sdk;
-    cmd.excuteCreateApp(folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+  catch (error) {
+    console.log(error);
   }
 }
 
