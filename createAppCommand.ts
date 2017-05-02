@@ -110,7 +110,7 @@ exports.handler = async function (argv) {
     sdk = argv.sdk;
   }
   else {
-    let sdkVersionConfig = await AppCommand.getServerJSONConfig("http://10.10.20.102:9999/versionconfig.json?" + Math.random());//TODO
+    let sdkVersionConfig = await AppCommand.getServerJSONConfig(AppCommand.VERSION_CONFIG_URL + '?' + Math.random());
     if (!sdkVersionConfig) {
       return;
     }
@@ -119,7 +119,13 @@ exports.handler = async function (argv) {
       if (!cmd.isSDKExists(sdkVersionConfig.versionList[0].version)){//最新版
         let zip = path.join(cmd.getSDKRootPath(),path.basename(sdkVersionConfig.versionList[0].url));
         await AppCommand.download(sdkVersionConfig.versionList[0].url,zip,function(){
-          
+          AppCommand.unzip(zip,path.dirname(zip),function(error: Error, stdout: string, stderr: string){
+            if (error){
+              console.log(error.name);
+              console.log(error.message);
+              console.log(error.stack);
+            }
+          });
         });//download
         sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
       }
@@ -136,7 +142,16 @@ exports.handler = async function (argv) {
         return;
       }
       if (!cmd.isSDKExists(argv.version)){
-        //download
+        let zip = path.join(cmd.getSDKRootPath(),path.basename(sdkVersionConfig.versionList[0].url));
+        await AppCommand.download(sdkVersionConfig.versionList[0].url,zip,function(){
+          AppCommand.unzip(zip,path.dirname(zip),function(error: Error, stdout: string, stderr: string){
+            if (error){
+              console.log(error.name);
+              console.log(error.message);
+              console.log(error.stack);
+            }
+          });
+        });//download
         sdk = cmd.getSDKPath(argv.version);
       }
     }

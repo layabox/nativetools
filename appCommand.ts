@@ -3,8 +3,10 @@ import * as path from 'path';
 import fs_extra = require('fs-extra');
 import gen_dcc = require('layadcc');
 import * as request from 'request';
+import child_process = require('child_process');
 
 export const STAND_ALONE_URL: string = 'http://stand.alone.version/index.html';
+export const VERSION_CONFIG_URL: string = 'http://10.10.20.102:9999/versionconfig.json';
 export const DEFAULT_NAME: string = 'LayaBox';
 export const DEFAULT_APP_NAME: string = 'LayaBox';
 export const DEFAULT_PACKAGE_NAME: string = 'com.layabox.game';
@@ -273,7 +275,7 @@ export async function getServerJSONConfig(url: string): Promise<any> {
         })
     });
 }
-export async function download(url: string, file: string, callBack: () =>void): Promise<boolean> {
+export async function download(url: string, file: string, callBack: () => void): Promise<boolean> {
     return new Promise<any>(function (res, rej) {
         let stream = fs.createWriteStream(file);
         let layaresponse;
@@ -290,4 +292,15 @@ export async function download(url: string, file: string, callBack: () =>void): 
             }
         });
     })
+}
+export async function unzip(unzipurl:string, filepath:string, callbackHandler) {
+    if (process.platform === 'darwin') {
+        var cmd = "unzip -o " + unzipurl + " -d " + filepath;
+        child_process.execSync(cmd);
+    }
+    else {
+        var unzipexepath = path.join(__dirname,'..', 'tools', 'unzip.exe');
+        var cmd = unzipexepath + " -o " + unzipurl + " -d " + filepath;
+        child_process.execSync(cmd);
+    }
 }
