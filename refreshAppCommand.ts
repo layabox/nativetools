@@ -75,7 +75,7 @@ exports.handler = function (argv) {
       return;
     }
 
-    if (!nativeJSON || !nativeJSON.h5 || nativeJSON.h5 === '' || nativeJSON.sdk) {
+    if (!nativeJSON || !nativeJSON.h5 || !nativeJSON.sdk) {
       console.log('Error: ' + nativeJSONPath + ' invalid.');
     }
     let folder = path.join(process.cwd(), nativeJSON.h5);
