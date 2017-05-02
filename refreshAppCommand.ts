@@ -10,11 +10,11 @@ exports.builder = {
   type:
   {
     alias: 't',
-    default: 0,
-    choices: [0, 1, 2],
+    //default: 0,
+    //choices: [0, 1, 2],
     required: false,
     requiresArg: true,
-    description: '0为只有url   1为URL+资源包  2为单机版本'
+    description: '0为只有url   1为URL+资源包  2为单机版本 \n [choices: 0, 1, 2] [default: 0]'
   },
   url:
   {
