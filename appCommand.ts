@@ -72,7 +72,8 @@ export class AppCommand {
         return true;
     }
     public check(argv: any, nativeJSON: any): boolean {
-        if (!argv.type) {
+
+        if (argv.type === undefined) {
             if (nativeJSON && nativeJSON.type) {
                 argv.type = nativeJSON.type;
             }

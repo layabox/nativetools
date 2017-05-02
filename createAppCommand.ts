@@ -73,7 +73,6 @@ exports.builder = {
   },
   package_name:
   {
-    alias: 'package_name',
     //default: 'com.layabox.game',
     required: false,
     requiresArg: true,
@@ -95,7 +94,7 @@ exports.handler = async function (argv) {
         console.log('Error: open ' + nativeJSONPath + ' error.');
         return;
       }
-      console.log(nativeJSON.native);//debug
+
       if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))) {
         console.log('Error: missing ' + nativeJSON.native + ' error.');
         return;
