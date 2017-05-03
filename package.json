@@ -1,8 +1,11 @@
 {
-  "name": "nativetools",
+  "name": "laya",
   "version": "1.0.0",
   "description": "laya native tools",
   "main": "index.js",
+  "bin":{
+	"layadcc":"./bin/exe.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
