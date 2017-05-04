@@ -4,6 +4,7 @@ import fs_extra = require('fs-extra');
 import gen_dcc = require('layadcc');
 import * as request from 'request';
 import child_process = require('child_process');
+import * as xmldom from 'xmldom';
 
 export const STAND_ALONE_URL: string = 'http://stand.alone.version/index.html';
 export const VERSION_CONFIG_URL: string = 'http://10.10.20.102:9999/versionconfig.json';
@@ -59,6 +60,7 @@ export class AppCommand {
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
         this.processDcc(config, folder, url, appPath);
+        this.processDisplayName(config, platform, app_name, appPath);
         this.processName(config, name, appPath);
 
         nativeJSON.type = type;
@@ -199,6 +201,42 @@ export class AppCommand {
             }
             gen_dcc.gendcc(res_path, outpath, true, false);
         }
+    }
+    private processDisplayName(config: any, platform: string, app_name: string, appPath: string) {
+
+        let file = path.join(appPath, config["template"]["display"]);
+        let xml = this.read(file);
+        let doc = new xmldom.DOMParser().parseFromString(xml);
+      
+        if (platform === PLATFORM_IOS) {
+            
+            let dictNode = doc.getElementsByTagName('dict')[0];
+            let keyNode = doc.createElement("key");
+            let keyTextNode = doc.createTextNode("CFBundleDisplayName");
+            keyNode.appendChild(keyTextNode);
+            dictNode.appendChild(keyNode);
+
+            let stringNode = doc.createElement("string");
+            let stringTextNode = doc.createTextNode(app_name);
+            stringNode.appendChild(stringTextNode);
+            dictNode.appendChild(stringNode);
+
+            dictNode.appendChild(stringNode);
+           
+        }
+        else{
+            let stringNodes = doc.getElementsByTagName('string');
+            for (let i = 0; i < stringNodes.length; i++){
+                if (stringNodes[i].attributes.getNamedItem("name").value === "app_name"){
+                    //stringNodes[i].childNodes[0].nodeValue = app_name;
+                    stringNodes[i].replaceChild(doc.createTextNode(app_name), stringNodes[i].childNodes[0]);
+                    break;
+                }
+            }
+        }
+        console.log(file);
+        console.log(doc.toString());
+        fs_extra.outputFileSync(file, doc.toString());
     }
     private processName(config: any, name: string, appPath: string) {
         var me = this;
