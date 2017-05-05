@@ -5,6 +5,7 @@ import gen_dcc = require('layadcc');
 import * as request from 'request';
 import child_process = require('child_process');
 import * as xmldom from 'xmldom';
+import * as ProgressBar from 'progress';
 
 export const STAND_ALONE_URL: string = 'http://stand.alone.version/index.html';
 export const VERSION_CONFIG_URL: string = 'http://10.10.20.102:9999/versionconfig.json';
@@ -235,8 +236,6 @@ export class AppCommand {
                 }
             }
         }
-        console.log(file);
-        console.log(doc.toString());
         fs_extra.outputFileSync(file, doc.toString());
     }
     private processName(config: any, name: string, appPath: string) {
@@ -319,8 +318,18 @@ export async function download(url: string, file: string, callBack: () => void):
     return new Promise<any>(function (res, rej) {
         let stream = fs.createWriteStream(file);
         let layaresponse;
+
+        var bar;
         request(url).on('response', function (response) {
             layaresponse = response;
+            var len = parseInt(layaresponse.headers['content-length'], 10);
+            bar = new ProgressBar('  downloading [:bar] :rate/bps :percent :etas', {
+            complete: '=',
+            incomplete: ' ',
+            width: 20,
+            total: len});
+        }).on('data', function(chunk){
+            bar.tick(chunk.length);
         }).pipe(stream).on('close', function () {
             if (layaresponse.statusCode === 200) {
                 callBack();
@@ -330,6 +339,8 @@ export async function download(url: string, file: string, callBack: () => void):
                 console.log('Error: ' + layaresponse.statusCode + ' download ' + url + ' error.');
                 res(false);
             }
+        }).on('end', function(){
+           console.log('\n');
         });
     })
 }

@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/layabox/nativetools#readme",
   "dependencies": {
+    "progress": "^2.0.0",
     "request": "^2.81.0",
     "xmldom": "^0.1.27"
   }

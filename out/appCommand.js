@@ -14,6 +14,8 @@ const fs_extra = require("fs-extra");
 const gen_dcc = require("layadcc");
 const request = require("request");
 const child_process = require("child_process");
+const xmldom = require("xmldom");
+const ProgressBar = require("progress");
 exports.STAND_ALONE_URL = 'http://stand.alone.version/index.html';
 exports.VERSION_CONFIG_URL = 'http://10.10.20.102:9999/versionconfig.json';
 exports.DEFAULT_NAME = 'LayaBox';
@@ -25,6 +27,7 @@ exports.PLATFORM_ANDROID_ALL = 'all';
 exports.PLATFORM_IOS = 'ios';
 exports.PLATFORM_ANDROID_ECLIPSE = 'android_eclipse';
 exports.PLATFORM_ANDROID_STUDIO = 'android_studio';
+exports.H5_PROJECT_CONFIG_FILE = 'config.json';
 class AppCommand {
     constructor() {
     }
@@ -59,6 +62,7 @@ class AppCommand {
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
         this.processDcc(config, folder, url, appPath);
+        this.processDisplayName(config, platform, app_name, appPath);
         this.processName(config, name, appPath);
         nativeJSON.type = type;
         nativeJSON.url = type == 2 ? exports.STAND_ALONE_URL : url;
@@ -162,7 +166,7 @@ class AppCommand {
         console.log('package_name: ' + package_name);
     }
     processDcc(config, folder, url, appPath) {
-        let res_path = this.getDataFolder(folder);
+        let res_path = this.getResFolder(folder);
         if (res_path && res_path != "" && fs.existsSync(res_path)) {
             var outpath = url;
             var index = outpath.indexOf('?');
@@ -184,6 +188,33 @@ class AppCommand {
             }
             gen_dcc.gendcc(res_path, outpath, true, false);
         }
+    }
+    processDisplayName(config, platform, app_name, appPath) {
+        let file = path.join(appPath, config["template"]["display"]);
+        let xml = this.read(file);
+        let doc = new xmldom.DOMParser().parseFromString(xml);
+        if (platform === exports.PLATFORM_IOS) {
+            let dictNode = doc.getElementsByTagName('dict')[0];
+            let keyNode = doc.createElement("key");
+            let keyTextNode = doc.createTextNode("CFBundleDisplayName");
+            keyNode.appendChild(keyTextNode);
+            dictNode.appendChild(keyNode);
+            let stringNode = doc.createElement("string");
+            let stringTextNode = doc.createTextNode(app_name);
+            stringNode.appendChild(stringTextNode);
+            dictNode.appendChild(stringNode);
+            dictNode.appendChild(stringNode);
+        }
+        else {
+            let stringNodes = doc.getElementsByTagName('string');
+            for (let i = 0; i < stringNodes.length; i++) {
+                if (stringNodes[i].attributes.getNamedItem("name").value === "app_name") {
+                    stringNodes[i].replaceChild(doc.createTextNode(app_name), stringNodes[i].childNodes[0]);
+                    break;
+                }
+            }
+        }
+        fs_extra.outputFileSync(file, doc.toString());
     }
     processName(config, name, appPath) {
         var me = this;
@@ -214,12 +245,13 @@ class AppCommand {
         return path.join(process.cwd(), exports.NATIVE_JSON_FILE_NAME);
     }
     isH5Folder(folder) {
-        return false;
+        return fs.existsSync(path.join(folder, exports.H5_PROJECT_CONFIG_FILE));
     }
     getH5BinFolder(folder) {
-        return "";
+        let config = fs_extra.readJSONSync(path.join(folder, exports.H5_PROJECT_CONFIG_FILE));
+        return path.join(folder, config.resource);
     }
-    getDataFolder(folder) {
+    getResFolder(folder) {
         if (this.isH5Folder(folder)) {
             return this.getH5BinFolder(folder);
         }
@@ -267,8 +299,18 @@ function download(url, file, callBack) {
         return new Promise(function (res, rej) {
             let stream = fs.createWriteStream(file);
             let layaresponse;
+            var bar;
             request(url).on('response', function (response) {
                 layaresponse = response;
+                var len = parseInt(layaresponse.headers['content-length'], 10);
+                bar = new ProgressBar('  downloading [:bar] :rate/bps :percent :etas', {
+                    complete: '=',
+                    incomplete: ' ',
+                    width: 20,
+                    total: len
+                });
+            }).on('data', function (chunk) {
+                bar.tick(chunk.length);
             }).pipe(stream).on('close', function () {
                 if (layaresponse.statusCode === 200) {
                     callBack();
@@ -278,6 +320,8 @@ function download(url, file, callBack) {
                     console.log('Error: ' + layaresponse.statusCode + ' download ' + url + ' error.');
                     res(false);
                 }
+            }).on('end', function () {
+                console.log('\n');
             });
         });
     });

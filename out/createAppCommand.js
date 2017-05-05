@@ -19,7 +19,7 @@ exports.builder = {
         alias: 'f',
         required: true,
         requiresArg: true,
-        description: 'html5项目目录，也可以是laya项目，也可以直接是data，比如bin，这个需要检测目录    必选'
+        description: 'html5项目目录或资源路径说明:把游戏资源打包进客户端以减少网络下载,选择本地的游戏目录，例如启动index在d:/game/wow/index.html下,那资源路径就是d:/game/wow    必选'
     },
     sdk: {
         alias: 's',
