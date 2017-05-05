@@ -61,7 +61,9 @@ export class AppCommand {
 
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
-        this.processDcc(config, folder, url, appPath);
+        if (type === 1 || type === 2){
+            this.processDcc(config, folder, url, appPath);
+        }
         this.processDisplayName(config, platform, app_name, appPath);
         this.processName(config, name, appPath);
 
