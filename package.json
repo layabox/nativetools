@@ -1,6 +1,6 @@
 {
   "name": "nativetools",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "laya native tools",
   "main": "index.js",
   "bin": {
