@@ -17,6 +17,7 @@ export const PLATFORM_ANDROID_ALL: string = 'all';
 export const PLATFORM_IOS: string = 'ios';
 export const PLATFORM_ANDROID_ECLIPSE: string = 'android_eclipse';
 export const PLATFORM_ANDROID_STUDIO: string = 'android_studio';
+export const H5_PROJECT_CONFIG_FILE: string = 'config.json';
 
 export class AppCommand {
 
@@ -175,7 +176,7 @@ export class AppCommand {
         console.log('package_name: ' + package_name);
     }
     private processDcc(config: any, folder: string, url: string, appPath: string) {
-        let res_path = this.getDataFolder(folder);//获取资源目录
+        let res_path = this.getResFolder(folder);//获取资源目录
         //资源打包路径
         if (res_path && res_path != "" && fs.existsSync(res_path)) {
             var outpath = url;
@@ -269,13 +270,13 @@ export class AppCommand {
         return path.join(process.cwd(), NATIVE_JSON_FILE_NAME);
     }
     private isH5Folder(folder: string): boolean {
-        return false;//TODO 项目配置JSON
+        return fs.existsSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
     }
     private getH5BinFolder(folder: string): string {
-        return "";//TODO 项目配置JSON
+        let config = fs_extra.readJSONSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
+        return path.join(folder,config.resource);
     }
-    private getDataFolder(folder: string): string {
-        //console.log("folder " + folder);//debug
+    private getResFolder(folder: string): string {
         if (this.isH5Folder(folder)) {
             return this.getH5BinFolder(folder);
         }
