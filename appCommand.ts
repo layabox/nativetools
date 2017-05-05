@@ -28,13 +28,18 @@ export class AppCommand {
         console.log('platform: ' + platform);
         console.log('sdk: ' + path.join(sdk, platform));
 
+        if (!fs.existsSync(folder)) {
+            console.log('Error: can not find directory ' + folder);
+            return false;
+        }
+
         var me = this;
         let appPath = this.getAppPath(name, platform, nativeJSON);
         //读取配置
 
         let configPath = path.join(path.join(sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
-            console.log('Error: can not find ' + configPath);
+            console.log('Error: can not find file ' + configPath);
             return false;
         }
         let config = fs_extra.readJSONSync(configPath);

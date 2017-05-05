@@ -34,11 +34,15 @@ class AppCommand {
     excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, nativeJSON) {
         console.log('platform: ' + platform);
         console.log('sdk: ' + path.join(sdk, platform));
+        if (!fs.existsSync(folder)) {
+            console.log('Error: can not find directory ' + folder);
+            return false;
+        }
         var me = this;
         let appPath = this.getAppPath(name, platform, nativeJSON);
         let configPath = path.join(path.join(sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
-            console.log('Error: can not find ' + configPath);
+            console.log('Error: can not find file ' + configPath);
             return false;
         }
         let config = fs_extra.readJSONSync(configPath);
