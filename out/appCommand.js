@@ -221,6 +221,7 @@ class AppCommand {
             }
         }
         fs_extra.outputFileSync(file, doc.toString());
+        console.log('app_name: ' + app_name);
     }
     processName(config, name, appPath) {
         var me = this;

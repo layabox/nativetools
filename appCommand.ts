@@ -244,6 +244,7 @@ export class AppCommand {
             }
         }
         fs_extra.outputFileSync(file, doc.toString());
+        console.log('app_name: ' + app_name);
     }
     private processName(config: any, name: string, appPath: string) {
         var me = this;
