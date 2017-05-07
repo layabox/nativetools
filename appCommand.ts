@@ -353,6 +353,7 @@ export async function download(url: string, file: string, callBack: () => void):
     })
 }
 export async function unzip(unzipurl:string, filepath:string, callbackHandler) {
+    console.log('unzip ' + unzipurl + ' to ' + filepath + ' ...');
     if (process.platform === 'darwin') {
         var cmd = "unzip -o " + unzipurl + " -d " + filepath;
         child_process.execSync(cmd);

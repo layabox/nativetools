@@ -336,6 +336,7 @@ function download(url, file, callBack) {
 exports.download = download;
 function unzip(unzipurl, filepath, callbackHandler) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log('unzip ' + unzipurl + ' to ' + filepath + ' ...');
         if (process.platform === 'darwin') {
             var cmd = "unzip -o " + unzipurl + " -d " + filepath;
             child_process.execSync(cmd);
