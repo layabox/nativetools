@@ -46,27 +46,27 @@ exports.handler = function (argv) {
         if (fs.existsSync(nativeJSONPath)) {
             nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
             if (!nativeJSON) {
-                console.log('Error: open ' + nativeJSONPath + ' error.');
+                console.log('错误：读取文件 ' + nativeJSONPath + ' 失败。');
                 return;
             }
             if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))) {
-                console.log('Error: missing ' + nativeJSON.native + ' error.');
+                console.log('错误：找不到文件 ' + nativeJSON.native + ' 。');
                 return;
             }
         }
         else {
-            console.log('Error: not find ' + nativeJSONPath + ' in current directory.');
+            console.log('错误: 在当前目录找不到文件 ' + nativeJSONPath + ' 。');
             return;
         }
         if (!cmd.check(argv, nativeJSON)) {
             return;
         }
         if (!nativeJSON || !nativeJSON.h5 || !nativeJSON.sdk) {
-            console.log('Error: ' + nativeJSONPath + ' invalid.');
+            console.log('错误: 文件 ' + nativeJSONPath + ' 无效。');
         }
         let folder = path.join(process.cwd(), nativeJSON.h5);
         if (!fs.existsSync(folder)) {
-            console.log('Error: not find ' + folder);
+            console.log('错误: 找不到目录 ' + folder + '。');
         }
         let app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_IOS, nativeJSON);
         if (fs.existsSync(app)) {

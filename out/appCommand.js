@@ -32,37 +32,27 @@ class AppCommand {
     constructor() {
     }
     excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, nativeJSON) {
-        console.log('platform: ' + platform);
-        console.log('sdk: ' + path.join(sdk, platform));
         if (!fs.existsSync(folder)) {
-            console.log('Error: can not find directory ' + folder);
+            console.log('错误: 找不到目录 ' + folder + '。');
             return false;
         }
         var me = this;
         let appPath = this.getAppPath(name, platform, nativeJSON);
         let configPath = path.join(path.join(sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
-            console.log('Error: can not find file ' + configPath);
+            console.log('错误: 找不到文件 ' + configPath);
             return false;
         }
         let config = fs_extra.readJSONSync(configPath);
         if (!config) {
-            console.log('Error: read ' + configPath + 'failed.');
+            console.log('错误: 读取文件 ' + configPath + ' 失败。');
             return false;
         }
         if (fs.existsSync(appPath)) {
-            console.log("同名文件 " + appPath + " 已经存在");
+            console.log("警告： 项目 " + appPath + " 已经存在。");
             return false;
         }
-        config["template"]["source"].forEach(function (source) {
-            var srcPath = path.join(path.join(sdk, platform), source);
-            var destPath = path.join(appPath, source);
-            if (fs.existsSync(destPath)) {
-                console.log("发现同名文件，请选择其他输出目录");
-                return false;
-            }
-            fs_extra.copySync(srcPath, destPath);
-        });
+        fs_extra.copySync(path.join(sdk, platform), appPath);
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
         if (type === 1 || type === 2) {
@@ -94,7 +84,6 @@ class AppCommand {
                 return false;
             }
         }
-        console.log('type: ' + argv.type);
         if (!argv.url) {
             if (nativeJSON && nativeJSON.url) {
                 argv.url = nativeJSON.url;
@@ -102,11 +91,11 @@ class AppCommand {
         }
         if (argv.type === 0 || argv.type === 1) {
             if (!argv.url || argv.url === '') {
-                console.log('Missing url');
+                console.log('错误：参数缺少--url。');
                 return false;
             }
             if (argv.url === exports.STAND_ALONE_URL) {
-                console.log('Invalid url');
+                console.log('错误：请提供有效参数--url。');
                 return false;
             }
         }
@@ -157,7 +146,6 @@ class AppCommand {
                 fs_extra.outputFileSync(srcPath, str);
             });
         }
-        console.log('url: ' + url);
     }
     processPackageName(config, package_name, appPath) {
         var me = this;
@@ -169,7 +157,6 @@ class AppCommand {
                 fs_extra.outputFileSync(destPath, str);
             });
         }
-        console.log('package_name: ' + package_name);
     }
     processDcc(config, folder, url, appPath) {
         let res_path = this.getResFolder(folder);
@@ -221,7 +208,6 @@ class AppCommand {
             }
         }
         fs_extra.outputFileSync(file, doc.toString());
-        console.log('app_name: ' + app_name);
     }
     processName(config, name, appPath) {
         var me = this;
@@ -240,7 +226,6 @@ class AppCommand {
             newPath = path.join(dir_name, new_base_name);
             fs.renameSync(oldPath, newPath);
         });
-        console.log('name: ' + name);
     }
     getAppPath(name, platform, nativeJSON) {
         if (nativeJSON && nativeJSON.native) {
@@ -308,7 +293,7 @@ function getServerJSONConfig(url) {
                     res(JSON.parse(body));
                 }
                 else {
-                    console.log('Error: ' + response.statusCode + ' download ' + url + ' error.');
+                    console.log('错误: ' + response.statusCode + ' 下载 ' + url + ' 错误。');
                     res(null);
                 }
             });
@@ -325,7 +310,7 @@ function download(url, file, callBack) {
             request(url).on('response', function (response) {
                 layaresponse = response;
                 var len = parseInt(layaresponse.headers['content-length'], 10);
-                bar = new ProgressBar('  downloading [:bar] :rate/bps :percent :etas', {
+                bar = new ProgressBar('  下载 [:bar] :rate/bps :percent :etas', {
                     complete: '=',
                     incomplete: ' ',
                     width: 20,
@@ -339,7 +324,7 @@ function download(url, file, callBack) {
                     res(true);
                 }
                 else {
-                    console.log('Error: ' + layaresponse.statusCode + ' download ' + url + ' error.');
+                    console.log('错误: ' + layaresponse.statusCode + ' 下载 ' + url + ' 错误。');
                     res(false);
                 }
             }).on('end', function () {
@@ -351,7 +336,7 @@ function download(url, file, callBack) {
 exports.download = download;
 function unzip(unzipurl, filepath, callbackHandler) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('unzip ' + unzipurl + ' to ' + filepath + ' ...');
+        console.log('正在解压 ' + unzipurl + ' 到 ' + filepath + ' ...');
         if (process.platform === 'darwin') {
             var cmd = "unzip -o " + unzipurl + " -d " + filepath;
             child_process.execSync(cmd);

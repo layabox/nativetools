@@ -76,23 +76,22 @@ exports.handler = function (argv) {
         try {
             let cmd = new AppCommand.AppCommand();
             let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
-            console.log('folder: ' + folder);
             let nativeJSON = null;
             let nativeJSONPath = cmd.getNativeJSONPath();
             if (fs.existsSync(nativeJSONPath)) {
                 nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
                 if (!nativeJSON) {
-                    console.log('Error: open ' + nativeJSONPath + ' error.');
+                    console.log('错误：读取文件 ' + nativeJSONPath + ' 失败。');
                     return;
                 }
                 if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))) {
-                    console.log('Error: missing ' + nativeJSON.native + ' error.');
+                    console.log('错误：找不到文件 ' + nativeJSON.native + ' 。');
                     return;
                 }
             }
             let sdk;
             if (argv.sdk && argv.version) {
-                console.log('--sdk and --version can only choose one of the two');
+                console.log('参数 --sdk 和 --version 不能同时指定两个。');
                 return;
             }
             else if (argv.sdk) {
@@ -129,7 +128,7 @@ exports.handler = function (argv) {
                         }
                     }
                     if (!found) {
-                        console.log('Invalid version ' + argv.version + ' not found');
+                        console.log('错误：版本 ' + argv.version + ' 服务器找不到。');
                         return;
                     }
                     if (!cmd.isSDKExists(argv.version)) {

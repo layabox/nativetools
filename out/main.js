@@ -11,6 +11,7 @@ if (process.argv.length === 2) {
   console.log('   refresh_app');
   console.log('       刷新当前目录对应的项目的资源和配置。');
   console.log('       具体帮助信息用 nativetools refresh_app --help 查看。');
+  return;
 }
 
 require('yargs')

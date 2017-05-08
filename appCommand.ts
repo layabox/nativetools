@@ -25,44 +25,35 @@ export class AppCommand {
     constructor() {
     }
     public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON: any): boolean {
-        console.log('platform: ' + platform);
-        console.log('sdk: ' + path.join(sdk, platform));
+        //console.log('platform: ' + platform);
+        //console.log('sdk: ' + path.join(sdk, platform));
 
         if (!fs.existsSync(folder)) {
-            console.log('Error: can not find directory ' + folder);
+            console.log('错误: 找不到目录 ' + folder + '。');
             return false;
         }
 
         var me = this;
         let appPath = this.getAppPath(name, platform, nativeJSON);
-        //读取配置
+
 
         let configPath = path.join(path.join(sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
-            console.log('Error: can not find file ' + configPath);
+            console.log('错误: 找不到文件 ' + configPath);
             return false;
         }
         let config = fs_extra.readJSONSync(configPath);
         if (!config) {
-            console.log('Error: read ' + configPath + 'failed.');
-            return false;
-        }
-        //判读项目是否已存在
-        if (fs.existsSync(appPath)) {
-            console.log("同名文件 " + appPath + " 已经存在");
+            console.log('错误: 读取文件 ' + configPath + ' 失败。');
             return false;
         }
 
-        //拷贝
-        config["template"]["source"].forEach(function (source) {
-            var srcPath = path.join(path.join(sdk, platform), source);
-            var destPath = path.join(appPath, source);
-            if (fs.existsSync(destPath)) {
-                console.log("发现同名文件，请选择其他输出目录");
-                return false;
-            }
-            fs_extra.copySync(srcPath, destPath);
-        });
+        if (fs.existsSync(appPath)) {
+            console.log("警告： 项目 " + appPath + " 已经存在。");
+            return false;
+        }
+
+        fs_extra.copySync(path.join(sdk, platform), appPath);
 
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
@@ -100,7 +91,7 @@ export class AppCommand {
                 return false;
             }
         }
-        console.log('type: ' + argv.type);
+        //console.log('type: ' + argv.type);
 
         if (!argv.url) {
             if (nativeJSON && nativeJSON.url) {
@@ -109,11 +100,11 @@ export class AppCommand {
         }
         if (argv.type === 0 || argv.type === 1) {
             if (!argv.url || argv.url === '') {
-                console.log('Missing url');
+                console.log('错误：参数缺少--url。');
                 return false;
             }
             if (argv.url === STAND_ALONE_URL) {
-                console.log('Invalid url');
+                console.log('错误：请提供有效参数--url。');
                 return false;
             }
         }
@@ -168,7 +159,7 @@ export class AppCommand {
                 fs_extra.outputFileSync(srcPath, str);
             });
         }
-        console.log('url: ' + url);
+        //console.log('url: ' + url);
     }
     private processPackageName(config: any, package_name: string, appPath: string) {
         //替换包名
@@ -181,7 +172,7 @@ export class AppCommand {
                 fs_extra.outputFileSync(destPath, str);
             });
         }
-        console.log('package_name: ' + package_name);
+        //console.log('package_name: ' + package_name);
     }
     private processDcc(config: any, folder: string, url: string, appPath: string) {
         let res_path = this.getResFolder(folder);//获取资源目录
@@ -212,7 +203,6 @@ export class AppCommand {
         }
     }
     private processDisplayName(config: any, platform: string, app_name: string, appPath: string) {
-
         let file = path.join(appPath, config["template"]["display"]);
         let xml = this.read(file);
         let doc = new xmldom.DOMParser().parseFromString(xml);
@@ -244,7 +234,7 @@ export class AppCommand {
             }
         }
         fs_extra.outputFileSync(file, doc.toString());
-        console.log('app_name: ' + app_name);
+        //console.log('app_name: ' + app_name);
     }
     private processName(config: any, name: string, appPath: string) {
         var me = this;
@@ -265,7 +255,7 @@ export class AppCommand {
             newPath = path.join(dir_name, new_base_name);
             fs.renameSync(oldPath, newPath);
         });
-        console.log('name: ' + name);
+        //console.log('name: ' + name);
     }
     public getAppPath(name: string, platform: string, nativeJSON: any): string {
         if (nativeJSON && nativeJSON.native) {
@@ -331,7 +321,7 @@ export async function getServerJSONConfig(url: string): Promise<any> {
                 res(JSON.parse(body));
             }
             else {
-                console.log('Error: ' + response.statusCode + ' download ' + url + ' error.');
+                console.log('错误: ' + response.statusCode + ' 下载 ' + url + ' 错误。');
                 res(null);
             }
         })
@@ -346,7 +336,7 @@ export async function download(url: string, file: string, callBack: () => void):
         request(url).on('response', function (response) {
             layaresponse = response;
             var len = parseInt(layaresponse.headers['content-length'], 10);
-            bar = new ProgressBar('  downloading [:bar] :rate/bps :percent :etas', {
+            bar = new ProgressBar('  下载 [:bar] :rate/bps :percent :etas', {
                 complete: '=',
                 incomplete: ' ',
                 width: 20,
@@ -360,7 +350,7 @@ export async function download(url: string, file: string, callBack: () => void):
                 res(true);
             }
             else {
-                console.log('Error: ' + layaresponse.statusCode + ' download ' + url + ' error.');
+                console.log('错误: ' + layaresponse.statusCode + ' 下载 ' + url + ' 错误。');
                 res(false);
             }
         }).on('end', function () {
@@ -369,7 +359,7 @@ export async function download(url: string, file: string, callBack: () => void):
     })
 }
 export async function unzip(unzipurl: string, filepath: string, callbackHandler) {
-    console.log('unzip ' + unzipurl + ' to ' + filepath + ' ...');
+    console.log('正在解压 ' + unzipurl + ' 到 ' + filepath + ' ...');
     if (process.platform === 'darwin') {
         var cmd = "unzip -o " + unzipurl + " -d " + filepath;
         child_process.execSync(cmd);
