@@ -264,14 +264,29 @@ class AppCommand {
         }
         return folder;
     }
+    getAppDataPath() {
+        let dataPath;
+        if (process.platform === 'darwin') {
+            let home = process.env.HOME || ("/Users/" + (process.env.NAME || process.env.LOGNAME));
+            dataPath = home + "/Library/Application Support/Laya/NativeTools/template/";
+        }
+        else {
+            var appdata = process.env.AppData || process.env.USERPROFILE + "/AppData/Roaming/";
+            dataPath = appdata + "/Laya/NativeTools/template/";
+        }
+        if (!fs_extra.existsSync(dataPath)) {
+            fs_extra.mkdirsSync(dataPath);
+        }
+        return dataPath;
+    }
     getSDKRootPath() {
-        return path.join(__dirname, '../template/');
+        return this.getAppDataPath();
     }
     getSDKPath(version) {
-        return path.join(__dirname, '../template/', version);
+        return path.join(this.getAppDataPath(), version);
     }
     isSDKExists(version) {
-        return fs.existsSync(path.join(__dirname, '../template/', version));
+        return fs.existsSync(path.join(this.getAppDataPath(), version));
     }
     read(path) {
         try {

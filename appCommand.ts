@@ -66,7 +66,7 @@ export class AppCommand {
 
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
-        if (type === 1 || type === 2){
+        if (type === 1 || type === 2) {
             this.processDcc(config, folder, url, appPath);
         }
         this.processDisplayName(config, platform, app_name, appPath);
@@ -216,9 +216,9 @@ export class AppCommand {
         let file = path.join(appPath, config["template"]["display"]);
         let xml = this.read(file);
         let doc = new xmldom.DOMParser().parseFromString(xml);
-      
+
         if (platform === PLATFORM_IOS) {
-            
+
             let dictNode = doc.getElementsByTagName('dict')[0];
             let keyNode = doc.createElement("key");
             let keyTextNode = doc.createTextNode("CFBundleDisplayName");
@@ -231,12 +231,12 @@ export class AppCommand {
             dictNode.appendChild(stringNode);
 
             dictNode.appendChild(stringNode);
-           
+
         }
-        else{
+        else {
             let stringNodes = doc.getElementsByTagName('string');
-            for (let i = 0; i < stringNodes.length; i++){
-                if (stringNodes[i].attributes.getNamedItem("name").value === "app_name"){
+            for (let i = 0; i < stringNodes.length; i++) {
+                if (stringNodes[i].attributes.getNamedItem("name").value === "app_name") {
                     //stringNodes[i].childNodes[0].nodeValue = app_name;
                     stringNodes[i].replaceChild(doc.createTextNode(app_name), stringNodes[i].childNodes[0]);
                     break;
@@ -281,7 +281,7 @@ export class AppCommand {
     }
     private getH5BinFolder(folder: string): string {
         let config = fs_extra.readJSONSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
-        return path.join(folder,config.resource);
+        return path.join(folder, config.resource);
     }
     private getResFolder(folder: string): string {
         if (this.isH5Folder(folder)) {
@@ -289,14 +289,29 @@ export class AppCommand {
         }
         return folder;//不是H5项目目录，直接认为是bin目录
     }
+    public getAppDataPath(): string {
+        let dataPath;
+        if (process.platform === 'darwin') {
+            let home = process.env.HOME || ("/Users/" + (process.env.NAME || process.env.LOGNAME));
+            dataPath = home + "/Library/Application Support/Laya/NativeTools/template/";
+        }
+        else {
+            var appdata = process.env.AppData || process.env.USERPROFILE + "/AppData/Roaming/";
+            dataPath = appdata + "/Laya/NativeTools/template/";
+        }
+        if (!fs_extra.existsSync(dataPath)) {
+            fs_extra.mkdirsSync(dataPath);
+        }
+        return dataPath;
+    }
     public getSDKRootPath(): string {
-        return path.join(__dirname, '../template/');
+        return this.getAppDataPath();
     }
     public getSDKPath(version: string): string {
-        return path.join(__dirname, '../template/', version);
+        return path.join(this.getAppDataPath(), version);
     }
     public isSDKExists(version: string): boolean {
-        return fs.existsSync(path.join(__dirname, '../template/', version));
+        return fs.existsSync(path.join(this.getAppDataPath(), version));
     }
     private read(path: string): string {
         try {
@@ -332,11 +347,12 @@ export async function download(url: string, file: string, callBack: () => void):
             layaresponse = response;
             var len = parseInt(layaresponse.headers['content-length'], 10);
             bar = new ProgressBar('  downloading [:bar] :rate/bps :percent :etas', {
-            complete: '=',
-            incomplete: ' ',
-            width: 20,
-            total: len});
-        }).on('data', function(chunk){
+                complete: '=',
+                incomplete: ' ',
+                width: 20,
+                total: len
+            });
+        }).on('data', function (chunk) {
             bar.tick(chunk.length);
         }).pipe(stream).on('close', function () {
             if (layaresponse.statusCode === 200) {
@@ -347,19 +363,19 @@ export async function download(url: string, file: string, callBack: () => void):
                 console.log('Error: ' + layaresponse.statusCode + ' download ' + url + ' error.');
                 res(false);
             }
-        }).on('end', function(){
-           console.log('\n');
+        }).on('end', function () {
+            console.log('\n');
         });
     })
 }
-export async function unzip(unzipurl:string, filepath:string, callbackHandler) {
+export async function unzip(unzipurl: string, filepath: string, callbackHandler) {
     console.log('unzip ' + unzipurl + ' to ' + filepath + ' ...');
     if (process.platform === 'darwin') {
         var cmd = "unzip -o " + unzipurl + " -d " + filepath;
         child_process.execSync(cmd);
     }
     else {
-        var unzipexepath = path.join(__dirname,'..', 'tools', 'unzip.exe');
+        var unzipexepath = path.join(__dirname, '..', 'tools', 'unzip.exe');
         var cmd = unzipexepath + " -o " + unzipurl + " -d " + filepath;
         child_process.execSync(cmd);
     }
