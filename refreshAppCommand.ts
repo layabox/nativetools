@@ -88,7 +88,7 @@ exports.handler = function (argv) {
       //let tempPath = fs.mkdtempSync(AppCommand.PLATFORM_IOS);
       let date = new Date;
       let tempPath = app + String(date.getTime());
-      fs.rename(app, tempPath);
+      fs.renameSync(app, tempPath);
       if (cmd.excuteCreateApp(folder, nativeJSON.sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)) {
         fs_extra.removeSync(tempPath);
       }
@@ -101,7 +101,7 @@ exports.handler = function (argv) {
     if (fs.existsSync(app)) {
       let date = new Date;
       let tempPath = app + String(date.getTime());
-      fs.rename(app, tempPath);
+      fs.renameSync(app, tempPath);
       if (cmd.excuteCreateApp(folder, nativeJSON.sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)) {
         fs_extra.removeSync(tempPath);
       }
@@ -114,7 +114,7 @@ exports.handler = function (argv) {
     if (fs.existsSync(app)) {
       let date = new Date;
       let tempPath = app + String(date.getTime());
-      fs.rename(app, tempPath);
+      fs.renameSync(app, tempPath);
       if (cmd.excuteCreateApp(folder, nativeJSON.sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)) {
         fs_extra.removeSync(tempPath);
       }
