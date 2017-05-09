@@ -4,7 +4,7 @@ import * as path from 'path';
 import fs_extra = require('fs-extra');
 
 
-exports.command = 'refresh_app [options]'
+exports.command = 'refresh_app';
 exports.describe = '刷新app项目'
 exports.builder = {
   type:

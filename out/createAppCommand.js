@@ -12,7 +12,7 @@ const AppCommand = require("./appCommand");
 const fs = require("fs");
 const path = require("path");
 const fs_extra = require("fs-extra");
-exports.command = 'create_app [options]';
+exports.command = 'create_app';
 exports.describe = '创建app项目';
 exports.builder = {
     folder: {

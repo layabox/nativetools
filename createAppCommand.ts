@@ -6,7 +6,7 @@ import fs_extra = require('fs-extra');
 
 import * as request from 'request';
 
-exports.command = 'create_app [options]'
+exports.command = 'create_app'
 exports.describe = '创建app项目'
 exports.builder = {
   folder:
