@@ -338,12 +338,12 @@ function unzip(unzipurl, filepath, callbackHandler) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('正在解压 ' + unzipurl + ' 到 ' + filepath + ' ...');
         if (process.platform === 'darwin') {
-            var cmd = "unzip -o " + unzipurl + " -d " + filepath;
+            var cmd = "unzip -o \"" + unzipurl + "\" -d \"" + filepath + "\"";
             child_process.execSync(cmd);
         }
         else {
             var unzipexepath = path.join(__dirname, '..', 'tools', 'unzip.exe');
-            var cmd = unzipexepath + " -o " + unzipurl + " -d " + filepath;
+            var cmd = "\"" + unzipexepath + "\" -o \"" + unzipurl + "\" -d \"" + filepath + "\"";
             child_process.execSync(cmd);
         }
     });

@@ -361,12 +361,12 @@ export async function download(url: string, file: string, callBack: () => void):
 export async function unzip(unzipurl: string, filepath: string, callbackHandler) {
     console.log('正在解压 ' + unzipurl + ' 到 ' + filepath + ' ...');
     if (process.platform === 'darwin') {
-        var cmd = "unzip -o " + unzipurl + " -d " + filepath;
+        var cmd = "unzip -o \"" + unzipurl + "\" -d \"" + filepath + "\"";
         child_process.execSync(cmd);
     }
     else {
         var unzipexepath = path.join(__dirname, '..', 'tools', 'unzip.exe');
-        var cmd = unzipexepath + " -o " + unzipurl + " -d " + filepath;
+        var cmd = "\"" + unzipexepath + "\" -o \"" + unzipurl + "\" -d \"" + filepath + "\"";
         child_process.execSync(cmd);
     }
 }
