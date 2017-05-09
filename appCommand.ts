@@ -39,7 +39,7 @@ export class AppCommand {
 
         let configPath = path.join(path.join(sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
-            console.log('错误: 找不到文件 ' + configPath);
+            console.log('错误: 找不到文件 ' + configPath + '。SDK文件可能已被删除，请重新下载。');
             return false;
         }
         let config = fs_extra.readJSONSync(configPath);
