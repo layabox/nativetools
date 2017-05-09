@@ -24,7 +24,9 @@ exports.handler = function (argv) {
             }
         }
         catch (error) {
-            console.log(error);
+            console.log();
+            console.log(error.name);
+            console.log(error.message);
         }
     });
 };

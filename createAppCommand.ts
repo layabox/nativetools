@@ -128,7 +128,7 @@ exports.handler = async function (argv) {
             });
           });
         }
-         sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
+        sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
       }
       else {
         let found = false;
@@ -180,7 +180,9 @@ exports.handler = async function (argv) {
     }
   }
   catch (error) {
-    console.log(error);
+    console.log();
+    console.log(error.name);
+    console.log(error.message);
   }
 }
 
