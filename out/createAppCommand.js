@@ -17,9 +17,8 @@ exports.describe = '创建app项目';
 exports.builder = {
     folder: {
         alias: 'f',
-        required: true,
         requiresArg: true,
-        description: 'html5项目目录或资源路径说明:把游戏资源打包进客户端以减少网络下载,选择本地的游\n戏目录，例如启动index在d:/game/wow/index.html下,那资源路径就是d:/game/wow'
+        description: 'html5项目目录或资源路径说明:把游戏资源打包进客户端以减少网络下载,选择本地\n的游戏目录，例如启动index在d:/game/index.html下,那资源路径就是d:/game'
     },
     sdk: {
         alias: 's',
@@ -73,23 +72,27 @@ exports.handler = function (argv) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let cmd = new AppCommand.AppCommand();
+            if (argv.folder === undefined) {
+                console.log('缺少必须的选项：folder');
+                return;
+            }
             let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
             let nativeJSON = null;
             let nativeJSONPath = cmd.getNativeJSONPath();
             if (fs.existsSync(nativeJSONPath)) {
                 nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
                 if (!nativeJSON) {
-                    console.log('错误：读取文件 ' + nativeJSONPath + ' 失败。');
+                    console.log('错误：读取文件 ' + nativeJSONPath + ' 失败');
                     return;
                 }
                 if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))) {
-                    console.log('错误：找不到文件 ' + nativeJSON.native + ' 。');
+                    console.log('错误：找不到文件 ' + nativeJSON.native);
                     return;
                 }
             }
             let sdk;
             if (argv.sdk && argv.version) {
-                console.log('参数 --sdk 和 --version 不能同时指定两个。');
+                console.log('参数 --sdk 和 --version 不能同时指定两个');
                 return;
             }
             else if (argv.sdk) {
@@ -126,7 +129,7 @@ exports.handler = function (argv) {
                         }
                     }
                     if (!found) {
-                        console.log('错误：版本 ' + argv.version + ' 服务器找不到。');
+                        console.log('错误：版本 ' + argv.version + ' 服务器找不到');
                         return;
                     }
                     if (!cmd.isSDKExists(argv.version)) {

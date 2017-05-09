@@ -33,23 +33,23 @@ class AppCommand {
     }
     excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, nativeJSON) {
         if (!fs.existsSync(folder)) {
-            console.log('错误: 找不到目录 ' + folder + '。');
+            console.log('错误: 找不到目录 ' + folder);
             return false;
         }
         var me = this;
         let appPath = this.getAppPath(name, platform, nativeJSON);
         let configPath = path.join(path.join(sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
-            console.log('错误: 找不到文件 ' + configPath + '。SDK文件可能已被删除，请重新下载。');
+            console.log('错误: 找不到文件 ' + configPath + '。SDK文件可能已被删除，请重新下载');
             return false;
         }
         let config = fs_extra.readJSONSync(configPath);
         if (!config) {
-            console.log('错误: 读取文件 ' + configPath + ' 失败。');
+            console.log('错误: 读取文件 ' + configPath + ' 失败');
             return false;
         }
         if (fs.existsSync(appPath)) {
-            console.log("警告： 项目 " + appPath + " 已经存在。");
+            console.log("警告： 项目 " + appPath + " 已经存在");
             return false;
         }
         fs_extra.copySync(path.join(sdk, platform), appPath);
@@ -102,11 +102,11 @@ class AppCommand {
         }
         if (argv.type === 0 || argv.type === 1) {
             if (!argv.url || argv.url === '') {
-                console.log('错误：参数缺少--url。');
+                console.log('错误：参数缺少--url');
                 return false;
             }
             if (argv.url === exports.STAND_ALONE_URL) {
-                console.log('错误：请提供有效参数--url。');
+                console.log('错误：请提供有效参数--url');
                 return false;
             }
         }
@@ -304,7 +304,7 @@ function getServerJSONConfig(url) {
                     res(JSON.parse(body));
                 }
                 else {
-                    console.log('错误: ' + response.statusCode + ' 下载 ' + url + ' 错误。');
+                    console.log('错误: ' + response.statusCode + ' 下载 ' + url + ' 错误');
                     res(null);
                 }
             });
@@ -335,7 +335,7 @@ function download(url, file, callBack) {
                     res(true);
                 }
                 else {
-                    console.log('错误: ' + layaresponse.statusCode + ' 下载 ' + url + ' 错误。');
+                    console.log('错误: ' + layaresponse.statusCode + ' 下载 ' + url + ' 错误');
                     res(false);
                 }
             }).on('end', function () {

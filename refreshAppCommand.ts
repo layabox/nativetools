@@ -58,16 +58,16 @@ exports.handler = function (argv) {
     if (fs.existsSync(nativeJSONPath)) {
       nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
       if (!nativeJSON) {
-        console.log('错误：读取文件 ' + nativeJSONPath + ' 失败。');
+        console.log('错误：读取文件 ' + nativeJSONPath + ' 失败');
         return;
       }
       if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))) {
-        console.log('错误：找不到文件 ' + nativeJSON.native + ' 。');
+        console.log('错误：找不到文件 ' + nativeJSON.native);
         return;
       }
     }
     else {
-      console.log('错误: 在当前目录找不到文件 ' + nativeJSONPath + ' 。');
+      console.log('错误: 在当前目录找不到文件 ' + nativeJSONPath);
       return;
     }
 
@@ -76,11 +76,11 @@ exports.handler = function (argv) {
     }
 
     if (!nativeJSON || !nativeJSON.h5 || !nativeJSON.sdk) {
-      console.log('错误: 文件 ' + nativeJSONPath + ' 无效。');
+      console.log('错误: 文件 ' + nativeJSONPath + ' 无效');
     }
     let folder = path.join(process.cwd(), nativeJSON.h5);
     if (!fs.existsSync(folder)) {
-      console.log('错误: 找不到目录 ' + folder + '。');
+      console.log('错误: 找不到目录 ' + folder);
     }
 
     let app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_IOS, nativeJSON);
@@ -126,7 +126,7 @@ exports.handler = function (argv) {
   catch (error) {
     console.log();
     if (error.code === 'EPERM') {
-      console.log('错误：文件已经被使用或被其他程序打开。');
+      console.log('错误：文件已经被使用或被其他程序打开');
     }
     console.log(error.name);
     console.log(error.message);
