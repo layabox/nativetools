@@ -86,8 +86,8 @@ export class AppCommand {
         else {
 
             if (argv.type !== 0 && argv.type !== 1 && argv.type != 2) {
-                console.log('Invalid values:');
-                console.log('  Argument: type, Given: ' + argv.type + ', Choices: 0, 1, 2');
+                console.log('无效的选项值：');
+                console.log('  选项名称: type, 传入的值: ' + argv.type + ', 可选的值： 0, 1, 2');
                 return false;
             }
         }
