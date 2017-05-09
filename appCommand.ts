@@ -75,6 +75,18 @@ export class AppCommand {
     }
     public check(argv: any, nativeJSON: any): boolean {
 
+        if (argv.platform === undefined) {
+            argv.platform = PLATFORM_ANDROID_ALL;
+        }
+        else {
+            if (argv.platform !== PLATFORM_ANDROID_ALL && argv.platform !== PLATFORM_IOS && argv.platform != PLATFORM_ANDROID_ECLIPSE && argv.platform != PLATFORM_ANDROID_STUDIO) {
+                console.log('无效的选项值：');
+                console.log('  选项名称: platform, 传入的值: ' + argv.platform + ', 可选的值：' + PLATFORM_ANDROID_ALL
+                + ',' + PLATFORM_IOS + ',' + PLATFORM_ANDROID_ECLIPSE + ',' + PLATFORM_ANDROID_STUDIO);
+                return false;
+            }
+        }
+
         if (argv.type === undefined) {
             if (nativeJSON && nativeJSON.type) {
                 argv.type = nativeJSON.type;

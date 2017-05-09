@@ -33,11 +33,11 @@ exports.builder = {
   platform:
   {
     alias: 'p',
-    default: AppCommand.PLATFORM_ANDROID_ALL,
-    choices: [AppCommand.PLATFORM_ANDROID_ALL, AppCommand.PLATFORM_IOS, AppCommand.PLATFORM_ANDROID_ECLIPSE, AppCommand.PLATFORM_ANDROID_STUDIO],
+    //default: AppCommand.PLATFORM_ANDROID_ALL,
+    //choices: [AppCommand.PLATFORM_ANDROID_ALL, AppCommand.PLATFORM_IOS, AppCommand.PLATFORM_ANDROID_ECLIPSE, AppCommand.PLATFORM_ANDROID_STUDIO],
     required: false,
     requiresArg: true,
-    description: '项目平台'
+    description: '项目平台 [可选值: 0, 1, 2] [默认值: 0]'
   },
   type:
   {

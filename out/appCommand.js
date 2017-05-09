@@ -69,6 +69,17 @@ class AppCommand {
         return true;
     }
     check(argv, nativeJSON) {
+        if (argv.platform === undefined) {
+            argv.platform = exports.PLATFORM_ANDROID_ALL;
+        }
+        else {
+            if (argv.platform !== exports.PLATFORM_ANDROID_ALL && argv.platform !== exports.PLATFORM_IOS && argv.platform != exports.PLATFORM_ANDROID_ECLIPSE && argv.platform != exports.PLATFORM_ANDROID_STUDIO) {
+                console.log('无效的选项值：');
+                console.log('  选项名称: platform, 传入的值: ' + argv.platform + ', 可选的值：' + exports.PLATFORM_ANDROID_ALL
+                    + ',' + exports.PLATFORM_IOS + ',' + exports.PLATFORM_ANDROID_ECLIPSE + ',' + exports.PLATFORM_ANDROID_STUDIO);
+                return false;
+            }
+        }
         if (argv.type === undefined) {
             if (nativeJSON && nativeJSON.type) {
                 argv.type = nativeJSON.type;
