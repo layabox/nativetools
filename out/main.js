@@ -22,5 +22,6 @@ require('yargs')
   .command(require('./createAppCommand'))
   .command(require('./refreshAppCommand'))
   .command(require('./listVersionsCommand'))
+  .locale('zh_CN')
   .help()
   .argv
