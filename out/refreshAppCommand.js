@@ -11,31 +11,31 @@ exports.builder = {
         alias: 't',
         required: false,
         requiresArg: true,
-        description: '创建类型 [0: 只有url 1: URL+资源包 2: 单机版本] \n [可选值: 0, 1, 2] [默认值: 0]'
+        description: '创建类型 [可选值: 0: 只有url 1: URL+资源包 2: 单机版本]'
     },
     url: {
         alias: 'u',
         required: false,
         requiresArg: true,
-        description: '游戏地址 [当t为0或者1的时候，必须填，当t为2的时候，不用填写]'
+        description: '游戏地址'
     },
     name: {
         alias: 'n',
         required: false,
         requiresArg: true,
-        description: '项目名称 [默认值: LayaBox]'
+        description: '项目名称'
     },
     app_name: {
         alias: 'a',
         required: false,
         requiresArg: true,
-        description: '应用名称 [默认值: LayaBox]'
+        description: '应用名称'
     },
     package_name: {
         alias: 'package_name',
         required: false,
         requiresArg: true,
-        description: '包名 [默认值: com.layabox.game]'
+        description: '包名'
     }
 };
 exports.handler = function (argv) {

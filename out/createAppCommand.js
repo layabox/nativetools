@@ -42,7 +42,7 @@ exports.builder = {
         alias: 't',
         required: false,
         requiresArg: true,
-        description: '创建类型 [0: 只有url 1: URL+资源包 2: 单机版本] \n [可选值: 0, 1, 2] [默认值: 0]'
+        description: '创建类型 [可选值: 0: 只有url 1: URL+资源包 2: 单机版本] [默认值: 0]'
     },
     url: {
         alias: 'u',
