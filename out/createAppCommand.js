@@ -18,19 +18,19 @@ exports.builder = {
     folder: {
         alias: 'f',
         requiresArg: true,
-        description: 'html5项目目录或资源路径说明:把游戏资源打包进客户端以减少网络下载,选择本地\n的游戏目录，例如启动index在d:/game/index.html下,那资源路径就是d:/game'
+        description: 'html5项目目录或资源路径 说明：把游戏资源打包进客户端以减少网络下载,选择本地\n的游戏目录，例如启动index在d:/game/index.html下,那资源路径就是d:/game'
     },
     sdk: {
         alias: 's',
         required: false,
         requiresArg: true,
-        description: 'SDK本地目录'
+        description: 'SDK本地目录 说明：自定义的SDK目录'
     },
     version: {
         alias: 'v',
         required: false,
         requiresArg: true,
-        description: 'SDK版本'
+        description: 'SDK版本 说明：自动使用特定版本的SDK，系统会从服务器下载SDK并存放在特定位置。--version和--sdk互相矛盾不能同时指定，都不指定时默认使用最新版本的SDK'
     },
     platform: {
         alias: 'p',
