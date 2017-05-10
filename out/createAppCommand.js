@@ -72,11 +72,6 @@ exports.handler = function (argv) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let cmd = new AppCommand.AppCommand();
-            if (argv.folder === undefined) {
-                console.log('缺少必须的选项：folder');
-                return;
-            }
-            let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
             let nativeJSON = null;
             let nativeJSONPath = cmd.getNativeJSONPath();
             if (fs.existsSync(nativeJSONPath)) {
@@ -90,6 +85,14 @@ exports.handler = function (argv) {
                     return;
                 }
             }
+            if (argv.folder === undefined && !nativeJSON) {
+                console.log('缺少必须的选项：folder');
+                return;
+            }
+            if (argv.folder === undefined && nativeJSON) {
+                argv.folder = nativeJSON.h5;
+            }
+            let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
             let sdk;
             if (argv.sdk && argv.version) {
                 console.log('参数 --sdk 和 --version 不能同时指定两个');
@@ -104,19 +107,24 @@ exports.handler = function (argv) {
                     return;
                 }
                 if (!argv.sdk && !argv.version) {
-                    if (!cmd.isSDKExists(sdkVersionConfig.versionList[0].version)) {
-                        let zip = path.join(cmd.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[0].url));
-                        yield AppCommand.download(sdkVersionConfig.versionList[0].url, zip, function () {
-                            AppCommand.unzip(zip, path.dirname(zip), function (error, stdout, stderr) {
-                                if (error) {
-                                    console.log(error.name);
-                                    console.log(error.message);
-                                    console.log(error.stack);
-                                }
-                            });
-                        });
+                    if (nativeJSON) {
+                        sdk = nativeJSON.sdk;
                     }
-                    sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
+                    else {
+                        if (!cmd.isSDKExists(sdkVersionConfig.versionList[0].version)) {
+                            let zip = path.join(cmd.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[0].url));
+                            yield AppCommand.download(sdkVersionConfig.versionList[0].url, zip, function () {
+                                AppCommand.unzip(zip, path.dirname(zip), function (error, stdout, stderr) {
+                                    if (error) {
+                                        console.log(error.name);
+                                        console.log(error.message);
+                                        console.log(error.stack);
+                                    }
+                                });
+                            });
+                        }
+                        sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
+                    }
                 }
                 else {
                     let found = false;

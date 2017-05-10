@@ -37,7 +37,7 @@ exports.builder = {
     //choices: [AppCommand.PLATFORM_ANDROID_ALL, AppCommand.PLATFORM_IOS, AppCommand.PLATFORM_ANDROID_ECLIPSE, AppCommand.PLATFORM_ANDROID_STUDIO],
     required: false,
     requiresArg: true,
-    description: '项目平台 [可选值: ' + AppCommand.PLATFORM_ANDROID_ALL + ', ' + AppCommand.PLATFORM_IOS + ', ' + AppCommand.PLATFORM_ANDROID_ECLIPSE + ', ' + AppCommand.PLATFORM_ANDROID_STUDIO+'] [默认值: ' + AppCommand.PLATFORM_ANDROID_ALL + ']'
+    description: '项目平台 [可选值: ' + AppCommand.PLATFORM_ANDROID_ALL + ', ' + AppCommand.PLATFORM_IOS + ', ' + AppCommand.PLATFORM_ANDROID_ECLIPSE + ', ' + AppCommand.PLATFORM_ANDROID_STUDIO + '] [默认值: ' + AppCommand.PLATFORM_ANDROID_ALL + ']'
   },
   type:
   {
@@ -83,12 +83,6 @@ exports.builder = {
 exports.handler = async function (argv) {
   try {
     let cmd = new AppCommand.AppCommand();
-    if (argv.folder === undefined){
-      console.log('缺少必须的选项：folder');
-      return;
-    }
-    let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
-    //console.log('folder: ' + folder);
 
     let nativeJSON = null;
     let nativeJSONPath = cmd.getNativeJSONPath();
@@ -105,6 +99,17 @@ exports.handler = async function (argv) {
       }
     }
 
+
+    if (argv.folder === undefined && !nativeJSON) {
+      console.log('缺少必须的选项：folder');
+      return;
+    }
+    if (argv.folder === undefined && nativeJSON) {
+      argv.folder = nativeJSON.h5;
+    }
+    let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
+    //console.log('folder: ' + folder);
+
     let sdk;
     if (argv.sdk && argv.version) {
       console.log('参数 --sdk 和 --version 不能同时指定两个');
@@ -120,19 +125,24 @@ exports.handler = async function (argv) {
       }
 
       if (!argv.sdk && !argv.version) {
-        if (!cmd.isSDKExists(sdkVersionConfig.versionList[0].version)) {//最新版 
-          let zip = path.join(cmd.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[0].url));
-          await AppCommand.download(sdkVersionConfig.versionList[0].url, zip, function () {
-            AppCommand.unzip(zip, path.dirname(zip), function (error: Error, stdout: string, stderr: string) {
-              if (error) {
-                console.log(error.name);
-                console.log(error.message);
-                console.log(error.stack);
-              }
-            });
-          });
+        if (nativeJSON) {
+           sdk = nativeJSON.sdk;
         }
-        sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
+        else {
+          if (!cmd.isSDKExists(sdkVersionConfig.versionList[0].version)) {//最新版 
+            let zip = path.join(cmd.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[0].url));
+            await AppCommand.download(sdkVersionConfig.versionList[0].url, zip, function () {
+              AppCommand.unzip(zip, path.dirname(zip), function (error: Error, stdout: string, stderr: string) {
+                if (error) {
+                  console.log(error.name);
+                  console.log(error.message);
+                  console.log(error.stack);
+                }
+              });
+            });
+          }
+          sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
+        }
       }
       else {
         let found = false;
