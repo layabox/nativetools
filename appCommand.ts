@@ -24,6 +24,45 @@ export class AppCommand {
 
     constructor() {
     }
+    public excuteRefreshApp(folder: string, platform: string, type: number, url: string, name: string, nativeJSON: any): boolean {
+        if (!fs.existsSync(folder)) {
+            console.log('错误: 找不到目录 ' + folder);
+            return false;
+        }
+
+        var me = this;
+        let appPath = this.getAppPath(name, platform, nativeJSON);
+
+
+        let configPath = path.join(appPath, "config.json");
+        if (!fs.existsSync(configPath)) {
+            console.log('错误: 找不到文件 ' + configPath);
+            return false;
+        }
+        let config = fs_extra.readJSONSync(configPath);
+        if (!config) {
+            console.log('错误: 读取文件 ' + configPath + ' 失败');
+            return false;
+        }
+
+        if (!fs.existsSync(appPath)) {
+            console.log("错误 :找不到目录 " + appPath);
+            return false;
+        }
+
+
+        this.processUrl(config, type, url, appPath);
+        if (type === 1 || type === 2) {
+            this.processDcc(config, folder, url, appPath);
+        }
+
+
+        nativeJSON.type = type;
+        nativeJSON.url = type == 2 ? STAND_ALONE_URL : url;
+        fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
+
+        return true;
+    }
     public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON: any): boolean {
         //console.log('platform: ' + platform);
         //console.log('sdk: ' + path.join(sdk, platform));
@@ -62,6 +101,7 @@ export class AppCommand {
         }
         this.processDisplayName(config, platform, app_name, appPath);
         this.processName(config, name, appPath);
+        this.processConfig(config, name, appPath);
 
         nativeJSON.type = type;
         nativeJSON.url = type == 2 ? STAND_ALONE_URL : url;
@@ -82,7 +122,7 @@ export class AppCommand {
             if (argv.platform !== PLATFORM_ANDROID_ALL && argv.platform !== PLATFORM_IOS && argv.platform != PLATFORM_ANDROID_ECLIPSE && argv.platform != PLATFORM_ANDROID_STUDIO) {
                 console.log('无效的选项值：');
                 console.log('  选项名称: platform, 传入的值: ' + argv.platform + ', 可选的值：' + PLATFORM_ANDROID_ALL
-                + ',' + PLATFORM_IOS + ',' + PLATFORM_ANDROID_ECLIPSE + ',' + PLATFORM_ANDROID_STUDIO);
+                    + ',' + PLATFORM_IOS + ',' + PLATFORM_ANDROID_ECLIPSE + ',' + PLATFORM_ANDROID_STUDIO);
                 return false;
             }
         }
@@ -268,6 +308,22 @@ export class AppCommand {
             fs.renameSync(oldPath, newPath);
         });
         //console.log('name: ' + name);
+    }
+    private processConfig(config: any, name: string, appPath: string) {
+        let newConfigPath = path.join(appPath, "config.json");
+        let newConfig = fs_extra.readJSONSync(newConfigPath);
+        if (!newConfig) {
+            console.log('错误: 读取文件 ' + newConfigPath + ' 失败');
+            return false;
+        }
+        for (var i = 0; i < config["url"]["replace"].length; i++) {
+            newConfig["url"]["replace"][i] = newConfig["url"]["replace"][i].replace(config["template"]["name"], name);
+        }
+        for (var i = 0; i < config["localize"]["replace"].length; i++) {
+            newConfig["localize"]["replace"][i] = newConfig["localize"]["replace"][i].replace(config["template"]["name"], name);
+        }
+        newConfig["res"]["path"] = newConfig["res"]["path"].replace(config["template"]["name"], name);
+        fs_extra.writeJSONSync(newConfigPath,newConfig);
     }
     public getAppPath(name: string, platform: string, nativeJSON: any): string {
         if (nativeJSON && nativeJSON.native) {

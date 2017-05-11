@@ -22,30 +22,6 @@ exports.builder = {
     required: false,
     requiresArg: true,
     description: '游戏地址'
-  },
-  name:
-  {
-    alias: 'n',
-    //default: 'LayaBox',
-    required: false,
-    requiresArg: true,
-    description: '项目名称 说明：native项目的名称'
-  },
-  app_name:
-  {
-    alias: 'a',
-    //default: 'LayaBox',
-    required: false,
-    requiresArg: true,
-    description: '应用名称 说明：app安装到手机后显示的名称'
-  },
-  package_name:
-  {
-    alias: 'package_name',
-    //default: 'com.layabox.game',
-    required: false,
-    requiresArg: true,
-    description: '包名'
   }
 }
 
@@ -75,7 +51,7 @@ exports.handler = function (argv) {
       return;
     }
 
-    if (!nativeJSON || !nativeJSON.h5 || !nativeJSON.sdk) {
+    if (!nativeJSON || !nativeJSON.h5) {
       console.log('错误: 文件 ' + nativeJSONPath + ' 无效');
     }
     let folder = path.join(process.cwd(), nativeJSON.h5);
@@ -85,42 +61,17 @@ exports.handler = function (argv) {
 
     let app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_IOS, nativeJSON);
     if (fs.existsSync(app)) {
-      //let tempPath = fs.mkdtempSync(AppCommand.PLATFORM_IOS);
-      let date = new Date;
-      let tempPath = app + String(date.getTime());
-      fs.renameSync(app, tempPath);
-      if (cmd.excuteCreateApp(folder, nativeJSON.sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)) {
-        fs_extra.removeSync(tempPath);
-      }
-      else {
-        fs.renameSync(tempPath, app);
-      }
+      cmd.excuteRefreshApp(folder, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, nativeJSON);
     }
 
     app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_ECLIPSE, nativeJSON);
     if (fs.existsSync(app)) {
-      let date = new Date;
-      let tempPath = app + String(date.getTime());
-      fs.renameSync(app, tempPath);
-      if (cmd.excuteCreateApp(folder, nativeJSON.sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)) {
-        fs_extra.removeSync(tempPath);
-      }
-      else {
-        fs.renameSync(tempPath, app);
-      }
+      cmd.excuteRefreshApp(folder, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, nativeJSON);
     }
 
     app = cmd.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_STUDIO, nativeJSON);
     if (fs.existsSync(app)) {
-      let date = new Date;
-      let tempPath = app + String(date.getTime());
-      fs.renameSync(app, tempPath);
-      if (cmd.excuteCreateApp(folder, nativeJSON.sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON)) {
-        fs_extra.removeSync(tempPath);
-      }
-      else {
-        fs.renameSync(tempPath, app);
-      }
+      cmd.excuteRefreshApp(folder, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, nativeJSON);
     }
   }
   catch (error) {

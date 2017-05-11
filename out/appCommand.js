@@ -31,6 +31,36 @@ exports.H5_PROJECT_CONFIG_FILE = 'config.json';
 class AppCommand {
     constructor() {
     }
+    excuteRefreshApp(folder, platform, type, url, name, nativeJSON) {
+        if (!fs.existsSync(folder)) {
+            console.log('错误: 找不到目录 ' + folder);
+            return false;
+        }
+        var me = this;
+        let appPath = this.getAppPath(name, platform, nativeJSON);
+        let configPath = path.join(appPath, "config.json");
+        if (!fs.existsSync(configPath)) {
+            console.log('错误: 找不到文件 ' + configPath);
+            return false;
+        }
+        let config = fs_extra.readJSONSync(configPath);
+        if (!config) {
+            console.log('错误: 读取文件 ' + configPath + ' 失败');
+            return false;
+        }
+        if (!fs.existsSync(appPath)) {
+            console.log("错误 :找不到目录 " + appPath);
+            return false;
+        }
+        this.processUrl(config, type, url, appPath);
+        if (type === 1 || type === 2) {
+            this.processDcc(config, folder, url, appPath);
+        }
+        nativeJSON.type = type;
+        nativeJSON.url = type == 2 ? exports.STAND_ALONE_URL : url;
+        fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
+        return true;
+    }
     excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, nativeJSON) {
         if (!fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
@@ -60,6 +90,7 @@ class AppCommand {
         }
         this.processDisplayName(config, platform, app_name, appPath);
         this.processName(config, name, appPath);
+        this.processConfig(config, name, appPath);
         nativeJSON.type = type;
         nativeJSON.url = type == 2 ? exports.STAND_ALONE_URL : url;
         nativeJSON.name = name;
@@ -237,6 +268,22 @@ class AppCommand {
             newPath = path.join(dir_name, new_base_name);
             fs.renameSync(oldPath, newPath);
         });
+    }
+    processConfig(config, name, appPath) {
+        let newConfigPath = path.join(appPath, "config.json");
+        let newConfig = fs_extra.readJSONSync(newConfigPath);
+        if (!newConfig) {
+            console.log('错误: 读取文件 ' + newConfigPath + ' 失败');
+            return false;
+        }
+        for (var i = 0; i < config["url"]["replace"].length; i++) {
+            newConfig["url"]["replace"][i] = newConfig["url"]["replace"][i].replace(config["template"]["name"], name);
+        }
+        for (var i = 0; i < config["localize"]["replace"].length; i++) {
+            newConfig["localize"]["replace"][i] = newConfig["localize"]["replace"][i].replace(config["template"]["name"], name);
+        }
+        newConfig["res"]["path"] = newConfig["res"]["path"].replace(config["template"]["name"], name);
+        fs_extra.writeJSONSync(newConfigPath, newConfig);
     }
     getAppPath(name, platform, nativeJSON) {
         if (nativeJSON && nativeJSON.native) {
