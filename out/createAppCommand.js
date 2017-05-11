@@ -54,13 +54,13 @@ exports.builder = {
         alias: 'n',
         required: false,
         requiresArg: true,
-        description: '项目名称 [默认值: LayaBox]'
+        description: '项目名称 说明：native项目的名称 [默认值: LayaBox]'
     },
     app_name: {
         alias: 'a',
         required: false,
         requiresArg: true,
-        description: '应用名称 [默认值: LayaBox]'
+        description: '应用名称 说明：app安装到手机后显示的名称 [默认值: LayaBox]'
     },
     package_name: {
         required: false,

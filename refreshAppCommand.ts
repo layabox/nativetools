@@ -29,7 +29,7 @@ exports.builder = {
     //default: 'LayaBox',
     required: false,
     requiresArg: true,
-    description: '项目名称'
+    description: '项目名称 说明：native项目的名称'
   },
   app_name:
   {
@@ -37,7 +37,7 @@ exports.builder = {
     //default: 'LayaBox',
     required: false,
     requiresArg: true,
-    description: '应用名称'
+    description: '应用名称 说明：app安装到手机后显示的名称'
   },
   package_name:
   {
