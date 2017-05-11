@@ -50,6 +50,9 @@ export class AppCommand {
             return false;
         }
 
+         if (type === 2){
+            url = STAND_ALONE_URL;
+        }
 
         this.processUrl(config, type, url, appPath);
 
@@ -61,7 +64,7 @@ export class AppCommand {
 
 
         nativeJSON.type = type;
-        nativeJSON.url = type == 2 ? STAND_ALONE_URL : url;
+        nativeJSON.url = url;
         fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
 
         return true;
@@ -97,6 +100,10 @@ export class AppCommand {
 
         fs_extra.copySync(path.join(sdk, platform), appPath);
 
+        if (type === 2){
+            url = STAND_ALONE_URL;
+        }
+
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
         if (type === 1 || type === 2) {
@@ -107,7 +114,7 @@ export class AppCommand {
         this.processConfig(config, name, appPath);
 
         nativeJSON.type = type;
-        nativeJSON.url = type == 2 ? STAND_ALONE_URL : url;
+        nativeJSON.url =  url;
         nativeJSON.name = name;
         nativeJSON.app_name = app_name;
         nativeJSON.package_name = package_name;
@@ -129,7 +136,10 @@ export class AppCommand {
                 return false;
             }
         }
-
+        
+        if (argv.type === 2 && argv.url) {
+            console.log("警告： 单机版不需要参数url");
+        }
         if (argv.type === undefined) {
             if (nativeJSON && nativeJSON.type) {
                 argv.type = nativeJSON.type;
@@ -155,7 +165,7 @@ export class AppCommand {
         }
         if (argv.type === 0 || argv.type === 1) {
             if (!argv.url || argv.url === '') {
-                console.log('错误：参数缺少--url');
+                console.log('错误：缺少参数--url');
                 return false;
             }
             if (argv.url === STAND_ALONE_URL) {
@@ -203,7 +213,6 @@ export class AppCommand {
                     fs.writeFileSync(p, s);
                 });
             }
-            url = STAND_ALONE_URL;
         }
 
         if (url && url != "") {

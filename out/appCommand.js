@@ -52,13 +52,16 @@ class AppCommand {
             console.log("错误 :找不到目录 " + appPath);
             return false;
         }
+        if (type === 2) {
+            url = exports.STAND_ALONE_URL;
+        }
         this.processUrl(config, type, url, appPath);
         fs_extra.emptyDirSync(path.join(appPath, config["res"]["path"]));
         if (type === 1 || type === 2) {
             this.processDcc(config, folder, url, appPath);
         }
         nativeJSON.type = type;
-        nativeJSON.url = type == 2 ? exports.STAND_ALONE_URL : url;
+        nativeJSON.url = url;
         fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
         return true;
     }
@@ -84,6 +87,9 @@ class AppCommand {
             return false;
         }
         fs_extra.copySync(path.join(sdk, platform), appPath);
+        if (type === 2) {
+            url = exports.STAND_ALONE_URL;
+        }
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
         if (type === 1 || type === 2) {
@@ -93,7 +99,7 @@ class AppCommand {
         this.processName(config, name, appPath);
         this.processConfig(config, name, appPath);
         nativeJSON.type = type;
-        nativeJSON.url = type == 2 ? exports.STAND_ALONE_URL : url;
+        nativeJSON.url = url;
         nativeJSON.name = name;
         nativeJSON.app_name = app_name;
         nativeJSON.package_name = package_name;
@@ -111,6 +117,9 @@ class AppCommand {
                     + ',' + exports.PLATFORM_IOS + ',' + exports.PLATFORM_ANDROID_ECLIPSE + ',' + exports.PLATFORM_ANDROID_STUDIO);
                 return false;
             }
+        }
+        if (argv.type === 2 && argv.url) {
+            console.log("警告： 单机版不需要参数url");
         }
         if (argv.type === undefined) {
             if (nativeJSON && nativeJSON.type) {
@@ -134,7 +143,7 @@ class AppCommand {
         }
         if (argv.type === 0 || argv.type === 1) {
             if (!argv.url || argv.url === '') {
-                console.log('错误：参数缺少--url');
+                console.log('错误：缺少参数--url');
                 return false;
             }
             if (argv.url === exports.STAND_ALONE_URL) {
@@ -179,7 +188,6 @@ class AppCommand {
                     fs.writeFileSync(p, s);
                 });
             }
-            url = exports.STAND_ALONE_URL;
         }
         if (url && url != "") {
             config["url"]["replace"].forEach(function (file) {
