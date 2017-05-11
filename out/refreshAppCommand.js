@@ -11,7 +11,7 @@ exports.builder = {
         alias: 't',
         required: false,
         requiresArg: true,
-        description: '创建类型 [可选值: 0: 只有url 1: URL+资源包 2: 单机版本]'
+        description: '创建类型 [可选值: 0: 不打资源包 1: 打资源包 2: 单机版本]'
     },
     url: {
         alias: 'u',
