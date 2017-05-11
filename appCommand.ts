@@ -31,7 +31,7 @@ export class AppCommand {
         }
 
         var me = this;
-        let appPath = this.getAppPath(name, platform, nativeJSON);
+        let appPath = AppCommand.getAppPath(name, platform, nativeJSON);
 
 
         let configPath = path.join(appPath, "config.json");
@@ -50,7 +50,7 @@ export class AppCommand {
             return false;
         }
 
-         if (type === 2){
+        if (type === 2) {
             url = STAND_ALONE_URL;
         }
 
@@ -65,7 +65,7 @@ export class AppCommand {
 
         nativeJSON.type = type;
         nativeJSON.url = url;
-        fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
+        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(), nativeJSON);
 
         return true;
     }
@@ -79,7 +79,7 @@ export class AppCommand {
         }
 
         var me = this;
-        let appPath = this.getAppPath(name, platform, nativeJSON);
+        let appPath = AppCommand.getAppPath(name, platform, nativeJSON);
 
 
         let configPath = path.join(path.join(sdk, platform), "config.json");
@@ -100,7 +100,7 @@ export class AppCommand {
 
         fs_extra.copySync(path.join(sdk, platform), appPath);
 
-        if (type === 2){
+        if (type === 2) {
             url = STAND_ALONE_URL;
         }
 
@@ -114,12 +114,12 @@ export class AppCommand {
         this.processConfig(config, name, appPath);
 
         nativeJSON.type = type;
-        nativeJSON.url =  url;
+        nativeJSON.url = url;
         nativeJSON.name = name;
         nativeJSON.app_name = app_name;
         nativeJSON.package_name = package_name;
 
-        fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
+        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(), nativeJSON);
 
         return true;
     }
@@ -136,7 +136,7 @@ export class AppCommand {
                 return false;
             }
         }
-        
+
         if (argv.type === 2 && argv.url) {
             console.log("警告： 单机版不需要参数url");
         }
@@ -239,7 +239,7 @@ export class AppCommand {
         //console.log('package_name: ' + package_name);
     }
     private processDcc(config: any, folder: string, url: string, appPath: string) {
-        let res_path = this.getResFolder(folder);//获取资源目录
+        let res_path = AppCommand.getResFolder(folder);//获取资源目录
         //资源打包路径
         if (res_path && res_path != "" && fs.existsSync(res_path)) {
             var outpath = url;
@@ -335,31 +335,31 @@ export class AppCommand {
             newConfig["localize"]["replace"][i] = newConfig["localize"]["replace"][i].replace(config["template"]["name"], name);
         }
         newConfig["res"]["path"] = newConfig["res"]["path"].replace(config["template"]["name"], name);
-        fs_extra.writeJSONSync(newConfigPath,newConfig);
+        fs_extra.writeJSONSync(newConfigPath, newConfig);
     }
-    public getAppPath(name: string, platform: string, nativeJSON: any): string {
+    static getAppPath(name: string, platform: string, nativeJSON: any): string {
         if (nativeJSON && nativeJSON.native) {
             return path.join(path.join(process.cwd(), nativeJSON.native), platform);
         }
         return path.join(path.join(process.cwd(), name), platform);
     }
-    public getNativeJSONPath(): string {
+    static getNativeJSONPath(): string {
         return path.join(process.cwd(), NATIVE_JSON_FILE_NAME);
     }
-    private isH5Folder(folder: string): boolean {
+    static isH5Folder(folder: string): boolean {
         return fs.existsSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
     }
-    private getH5BinFolder(folder: string): string {
+    static getH5BinFolder(folder: string): string {
         let config = fs_extra.readJSONSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
         return path.join(folder, config.resource);
     }
-    private getResFolder(folder: string): string {
-        if (this.isH5Folder(folder)) {
-            return this.getH5BinFolder(folder);
+    static getResFolder(folder: string): string {
+        if (AppCommand.isH5Folder(folder)) {
+            return AppCommand.getH5BinFolder(folder);
         }
         return folder;//不是H5项目目录，直接认为是bin目录
     }
-    public getAppDataPath(): string {
+    static getAppDataPath(): string {
         let dataPath;
         if (process.platform === 'darwin') {
             let home = process.env.HOME || ("/Users/" + (process.env.NAME || process.env.LOGNAME));
@@ -374,14 +374,14 @@ export class AppCommand {
         }
         return dataPath;
     }
-    public getSDKRootPath(): string {
-        return this.getAppDataPath();
+    static getSDKRootPath(): string {
+        return AppCommand.getAppDataPath();
     }
-    public getSDKPath(version: string): string {
-        return path.join(this.getAppDataPath(), version);
+    static getSDKPath(version: string): string {
+        return path.join(AppCommand.getAppDataPath(), version);
     }
-    public isSDKExists(version: string): boolean {
-        return fs.existsSync(path.join(this.getAppDataPath(), version));
+    static isSDKExists(version: string): boolean {
+        return fs.existsSync(path.join(AppCommand.getAppDataPath(), version));
     }
     private read(path: string): string {
         try {
@@ -407,6 +407,7 @@ export async function getServerJSONConfig(url: string): Promise<any> {
         })
     });
 }
+
 export async function download(url: string, file: string, callBack: () => void): Promise<boolean> {
     return new Promise<any>(function (res, rej) {
         let stream = fs.createWriteStream(file);

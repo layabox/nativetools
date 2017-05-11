@@ -85,7 +85,7 @@ exports.handler = async function (argv) {
     let cmd = new AppCommand.AppCommand();
 
     let nativeJSON = null;
-    let nativeJSONPath = cmd.getNativeJSONPath();
+    let nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath();
     if (fs.existsSync(nativeJSONPath)) {
       nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
       if (!nativeJSON) {
@@ -129,8 +129,8 @@ exports.handler = async function (argv) {
            sdk = nativeJSON.sdk;
         }
         else {
-          if (!cmd.isSDKExists(sdkVersionConfig.versionList[0].version)) {//最新版 
-            let zip = path.join(cmd.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[0].url));
+          if (!AppCommand.AppCommand.isSDKExists(sdkVersionConfig.versionList[0].version)) {//最新版 
+            let zip = path.join(AppCommand.AppCommand.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[0].url));
             await AppCommand.download(sdkVersionConfig.versionList[0].url, zip, function () {
               AppCommand.unzip(zip, path.dirname(zip), function (error: Error, stdout: string, stderr: string) {
                 if (error) {
@@ -141,7 +141,7 @@ exports.handler = async function (argv) {
               });
             });
           }
-          sdk = cmd.getSDKPath(sdkVersionConfig.versionList[0].version);
+          sdk = AppCommand.AppCommand.getSDKPath(sdkVersionConfig.versionList[0].version);
         }
       }
       else {
@@ -158,8 +158,8 @@ exports.handler = async function (argv) {
           console.log('错误：版本 ' + argv.version + ' 服务器找不到');
           return;
         }
-        if (!cmd.isSDKExists(argv.version)) {
-          let zip = path.join(cmd.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[index].url));
+        if (!AppCommand.AppCommand.isSDKExists(argv.version)) {
+          let zip = path.join(AppCommand.AppCommand.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[index].url));
           await AppCommand.download(sdkVersionConfig.versionList[index].url, zip, function () {
             AppCommand.unzip(zip, path.dirname(zip), function (error: Error, stdout: string, stderr: string) {
               if (error) {
@@ -170,7 +170,7 @@ exports.handler = async function (argv) {
             });
           });
         }
-        sdk = cmd.getSDKPath(argv.version);
+        sdk = AppCommand.AppCommand.getSDKPath(argv.version);
       }
     }
 

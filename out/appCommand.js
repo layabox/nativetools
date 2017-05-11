@@ -37,7 +37,7 @@ class AppCommand {
             return false;
         }
         var me = this;
-        let appPath = this.getAppPath(name, platform, nativeJSON);
+        let appPath = AppCommand.getAppPath(name, platform, nativeJSON);
         let configPath = path.join(appPath, "config.json");
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath);
@@ -62,7 +62,7 @@ class AppCommand {
         }
         nativeJSON.type = type;
         nativeJSON.url = url;
-        fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
+        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(), nativeJSON);
         return true;
     }
     excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, nativeJSON) {
@@ -71,7 +71,7 @@ class AppCommand {
             return false;
         }
         var me = this;
-        let appPath = this.getAppPath(name, platform, nativeJSON);
+        let appPath = AppCommand.getAppPath(name, platform, nativeJSON);
         let configPath = path.join(path.join(sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath + '。SDK文件可能已被删除，请重新下载');
@@ -103,7 +103,7 @@ class AppCommand {
         nativeJSON.name = name;
         nativeJSON.app_name = app_name;
         nativeJSON.package_name = package_name;
-        fs_extra.writeJSONSync(this.getNativeJSONPath(), nativeJSON);
+        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(), nativeJSON);
         return true;
     }
     check(argv, nativeJSON) {
@@ -210,7 +210,7 @@ class AppCommand {
         }
     }
     processDcc(config, folder, url, appPath) {
-        let res_path = this.getResFolder(folder);
+        let res_path = AppCommand.getResFolder(folder);
         if (res_path && res_path != "" && fs.existsSync(res_path)) {
             var outpath = url;
             var index = outpath.indexOf('?');
@@ -294,29 +294,29 @@ class AppCommand {
         newConfig["res"]["path"] = newConfig["res"]["path"].replace(config["template"]["name"], name);
         fs_extra.writeJSONSync(newConfigPath, newConfig);
     }
-    getAppPath(name, platform, nativeJSON) {
+    static getAppPath(name, platform, nativeJSON) {
         if (nativeJSON && nativeJSON.native) {
             return path.join(path.join(process.cwd(), nativeJSON.native), platform);
         }
         return path.join(path.join(process.cwd(), name), platform);
     }
-    getNativeJSONPath() {
+    static getNativeJSONPath() {
         return path.join(process.cwd(), exports.NATIVE_JSON_FILE_NAME);
     }
-    isH5Folder(folder) {
+    static isH5Folder(folder) {
         return fs.existsSync(path.join(folder, exports.H5_PROJECT_CONFIG_FILE));
     }
-    getH5BinFolder(folder) {
+    static getH5BinFolder(folder) {
         let config = fs_extra.readJSONSync(path.join(folder, exports.H5_PROJECT_CONFIG_FILE));
         return path.join(folder, config.resource);
     }
-    getResFolder(folder) {
-        if (this.isH5Folder(folder)) {
-            return this.getH5BinFolder(folder);
+    static getResFolder(folder) {
+        if (AppCommand.isH5Folder(folder)) {
+            return AppCommand.getH5BinFolder(folder);
         }
         return folder;
     }
-    getAppDataPath() {
+    static getAppDataPath() {
         let dataPath;
         if (process.platform === 'darwin') {
             let home = process.env.HOME || ("/Users/" + (process.env.NAME || process.env.LOGNAME));
@@ -331,14 +331,14 @@ class AppCommand {
         }
         return dataPath;
     }
-    getSDKRootPath() {
-        return this.getAppDataPath();
+    static getSDKRootPath() {
+        return AppCommand.getAppDataPath();
     }
-    getSDKPath(version) {
-        return path.join(this.getAppDataPath(), version);
+    static getSDKPath(version) {
+        return path.join(AppCommand.getAppDataPath(), version);
     }
-    isSDKExists(version) {
-        return fs.existsSync(path.join(this.getAppDataPath(), version));
+    static isSDKExists(version) {
+        return fs.existsSync(path.join(AppCommand.getAppDataPath(), version));
     }
     read(path) {
         try {
