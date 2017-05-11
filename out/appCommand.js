@@ -53,6 +53,7 @@ class AppCommand {
             return false;
         }
         this.processUrl(config, type, url, appPath);
+        fs_extra.emptyDirSync(path.join(appPath, config["res"]["path"]));
         if (type === 1 || type === 2) {
             this.processDcc(config, folder, url, appPath);
         }
