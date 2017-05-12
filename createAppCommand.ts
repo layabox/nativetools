@@ -101,7 +101,7 @@ exports.handler = async function (argv) {
 
 
     if (argv.folder === undefined && !nativeJSON) {
-      console.log('缺少必须的选项：folder');
+      console.log('错误：缺少必须的选项：folder');
       return;
     }
     if (argv.folder === undefined && nativeJSON) {
@@ -112,7 +112,7 @@ exports.handler = async function (argv) {
 
     let sdk;
     if (argv.sdk && argv.version) {
-      console.log('参数 --sdk 和 --version 不能同时指定两个');
+      console.log('错误：参数 --sdk 和 --version 不能同时指定两个');
       return;
     }
     else if (argv.sdk) {
