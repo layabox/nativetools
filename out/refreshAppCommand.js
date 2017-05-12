@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const AppCommand = require("./appCommand");
 const fs = require("fs");
 const path = require("path");
