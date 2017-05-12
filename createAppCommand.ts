@@ -93,7 +93,7 @@ export var handler = async function (argv) {
         return;
       }
 
-      if (!fs.existsSync(path.join(process.cwd(), nativeJSON.native))) {
+      if (!fs.existsSync(AppCommand.AppCommand.getNativePath(argv.name, nativeJSON, argv.outputPath))) {
         console.log('错误：找不到文件 ' + nativeJSON.native);
         return;
       }

@@ -370,6 +370,15 @@ export class AppCommand {
         }
         return path.join(process.cwd(), NATIVE_JSON_FILE_NAME);
     }
+    static getNativePath(name: string, nativeJSON: any, outputPath: string): string {
+        if (outputPath) {
+            if (path.isAbsolute(outputPath))
+                return path.join(outputPath, name);
+            else
+                return path.join(process.cwd(), outputPath, name);
+        }
+        return path.join(process.cwd(), nativeJSON.native);
+    }
     static isH5Folder(folder: string): boolean {
         return fs.existsSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
     }
