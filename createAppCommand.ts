@@ -6,9 +6,9 @@ import fs_extra = require('fs-extra');
 
 import * as request from 'request';
 
-exports.command = 'create_app'
-exports.describe = '创建app项目'
-exports.builder = {
+export var command = 'create_app'
+export var describe = '创建app项目'
+export var builder = {
   folder:
   {
     alias: 'f',
@@ -80,7 +80,7 @@ exports.builder = {
   }
 }
 
-exports.handler = async function (argv) {
+export var handler = async function (argv) {
   try {
     let cmd = new AppCommand.AppCommand();
 
