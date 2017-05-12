@@ -37,7 +37,7 @@ class AppCommand {
             return false;
         }
         var me = this;
-        let appPath = AppCommand.getAppPath(name, platform, nativeJSON);
+        let appPath = AppCommand.getAppPath(name, platform, nativeJSON, null);
         let configPath = path.join(appPath, "config.json");
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath);
@@ -62,16 +62,16 @@ class AppCommand {
         }
         nativeJSON.type = type;
         nativeJSON.url = url;
-        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(), nativeJSON);
+        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(null), nativeJSON);
         return true;
     }
-    excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, nativeJSON) {
+    excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, nativeJSON, outputPath) {
         if (!fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
             return false;
         }
         var me = this;
-        let appPath = AppCommand.getAppPath(name, platform, nativeJSON);
+        let appPath = AppCommand.getAppPath(name, platform, nativeJSON, outputPath);
         let configPath = path.join(path.join(sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath + '。SDK文件可能已被删除，请重新下载');
@@ -103,7 +103,7 @@ class AppCommand {
         nativeJSON.name = name;
         nativeJSON.app_name = app_name;
         nativeJSON.package_name = package_name;
-        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(), nativeJSON);
+        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(outputPath), nativeJSON);
         return true;
     }
     check(argv, nativeJSON) {
@@ -304,13 +304,27 @@ class AppCommand {
         newConfig["res"]["path"] = newConfig["res"]["path"].replace(config["template"]["name"], name);
         fs_extra.writeJSONSync(newConfigPath, newConfig);
     }
-    static getAppPath(name, platform, nativeJSON) {
-        if (nativeJSON && nativeJSON.native) {
-            return path.join(path.join(process.cwd(), nativeJSON.native), platform);
+    static getAppPath(name, platform, nativeJSON, outputPath) {
+        if (outputPath) {
+            if (path.isAbsolute(outputPath))
+                return path.join(outputPath, name, platform);
+            else
+                return path.join(process.cwd(), outputPath, name, platform);
         }
-        return path.join(path.join(process.cwd(), name), platform);
+        else {
+            if (nativeJSON && nativeJSON.native) {
+                return path.join(path.join(process.cwd(), nativeJSON.native), platform);
+            }
+            return path.join(path.join(process.cwd(), name), platform);
+        }
     }
-    static getNativeJSONPath() {
+    static getNativeJSONPath(outputPath) {
+        if (outputPath) {
+            if (path.isAbsolute(outputPath))
+                return path.join(outputPath, exports.NATIVE_JSON_FILE_NAME);
+            else
+                return path.join(process.cwd(), outputPath, exports.NATIVE_JSON_FILE_NAME);
+        }
         return path.join(process.cwd(), exports.NATIVE_JSON_FILE_NAME);
     }
     static isH5Folder(folder) {

@@ -30,7 +30,7 @@ exports.handler = function (argv) {
     let cmd = new AppCommand.AppCommand();
 
     let nativeJSON = null;
-    let nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath();
+    let nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath(null);
     if (fs.existsSync(nativeJSONPath)) {
       nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
       if (!nativeJSON) {
@@ -59,17 +59,17 @@ exports.handler = function (argv) {
       console.log('错误: 找不到目录 ' + folder);
     }
 
-    let app = AppCommand.AppCommand.getAppPath(argv.name, AppCommand.PLATFORM_IOS, nativeJSON);
+    let app = AppCommand.AppCommand.getAppPath(argv.name, AppCommand.PLATFORM_IOS, nativeJSON, null);
     if (fs.existsSync(app)) {
       cmd.excuteRefreshApp(folder, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, nativeJSON);
     }
 
-    app = AppCommand.AppCommand.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_ECLIPSE, nativeJSON);
+    app = AppCommand.AppCommand.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_ECLIPSE, nativeJSON, null);
     if (fs.existsSync(app)) {
       cmd.excuteRefreshApp(folder, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, nativeJSON);
     }
 
-    app = AppCommand.AppCommand.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_STUDIO, nativeJSON);
+    app = AppCommand.AppCommand.getAppPath(argv.name, AppCommand.PLATFORM_ANDROID_STUDIO, nativeJSON, null);
     if (fs.existsSync(app)) {
       cmd.excuteRefreshApp(folder, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, nativeJSON);
     }

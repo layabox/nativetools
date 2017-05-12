@@ -31,7 +31,7 @@ export class AppCommand {
         }
 
         var me = this;
-        let appPath = AppCommand.getAppPath(name, platform, nativeJSON);
+        let appPath = AppCommand.getAppPath(name, platform, nativeJSON,null);
 
 
         let configPath = path.join(appPath, "config.json");
@@ -65,11 +65,11 @@ export class AppCommand {
 
         nativeJSON.type = type;
         nativeJSON.url = url;
-        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(), nativeJSON);
+        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(null), nativeJSON);
 
         return true;
     }
-    public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON: any): boolean {
+    public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON: any, outputPath: string): boolean {
         //console.log('platform: ' + platform);
         //console.log('sdk: ' + path.join(sdk, platform));
 
@@ -79,7 +79,7 @@ export class AppCommand {
         }
 
         var me = this;
-        let appPath = AppCommand.getAppPath(name, platform, nativeJSON);
+        let appPath = AppCommand.getAppPath(name, platform, nativeJSON, outputPath);
 
 
         let configPath = path.join(path.join(sdk, platform), "config.json");
@@ -119,7 +119,7 @@ export class AppCommand {
         nativeJSON.app_name = app_name;
         nativeJSON.package_name = package_name;
 
-        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(), nativeJSON);
+        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(outputPath), nativeJSON);
 
         return true;
     }
@@ -214,7 +214,7 @@ export class AppCommand {
                 });
             }
         }
-        else{
+        else {
             if (config.localize && config.localize.replace) {
                 config.localize.replace.forEach((v, i, arr) => {
                     var p = path.join(appPath, v);
@@ -347,13 +347,27 @@ export class AppCommand {
         newConfig["res"]["path"] = newConfig["res"]["path"].replace(config["template"]["name"], name);
         fs_extra.writeJSONSync(newConfigPath, newConfig);
     }
-    static getAppPath(name: string, platform: string, nativeJSON: any): string {
-        if (nativeJSON && nativeJSON.native) {
-            return path.join(path.join(process.cwd(), nativeJSON.native), platform);
+    static getAppPath(name: string, platform: string, nativeJSON: any, outputPath: string): string {
+        if (outputPath) {
+            if (path.isAbsolute(outputPath))
+                return path.join(outputPath, name, platform);
+            else
+                return path.join(process.cwd(), outputPath, name, platform);
         }
-        return path.join(path.join(process.cwd(), name), platform);
+        else {
+            if (nativeJSON && nativeJSON.native) {
+                return path.join(path.join(process.cwd(), nativeJSON.native), platform);
+            }
+            return path.join(path.join(process.cwd(), name), platform);
+        }
     }
-    static getNativeJSONPath(): string {
+    static getNativeJSONPath(outputPath: string): string {
+        if (outputPath) {
+            if (path.isAbsolute(outputPath))
+                return path.join(outputPath, NATIVE_JSON_FILE_NAME);
+            else
+                return path.join(process.cwd(), outputPath, NATIVE_JSON_FILE_NAME);
+        }
         return path.join(process.cwd(), NATIVE_JSON_FILE_NAME);
     }
     static isH5Folder(folder: string): boolean {

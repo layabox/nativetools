@@ -73,7 +73,7 @@ exports.handler = function (argv) {
         try {
             let cmd = new AppCommand.AppCommand();
             let nativeJSON = null;
-            let nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath();
+            let nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath(argv.outputPath);
             if (fs.existsSync(nativeJSONPath)) {
                 nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
                 if (!nativeJSON) {
@@ -163,13 +163,13 @@ exports.handler = function (argv) {
             }
             if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
                 nativeJSON.sdk = sdk;
-                cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
-                cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
-                cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+                cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON, argv.outputPath);
+                cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON, argv.outputPath);
+                cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON, argv.outputPath);
             }
             else {
                 nativeJSON.sdk = sdk;
-                cmd.excuteCreateApp(folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON);
+                cmd.excuteCreateApp(folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON, argv.outputPath);
             }
         }
         catch (error) {
