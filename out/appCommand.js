@@ -55,7 +55,7 @@ class AppCommand {
             url = exports.STAND_ALONE_URL;
         }
         this.processUrl(config, type, url, appPath);
-        fs_extra.emptyDirSync(path.join(appPath, config["res"]["path"]));
+        fs_extra.removeSync(path.join(appPath, config["res"]["path"]));
         if (type === 1 || type === 2) {
             this.processDcc(config, folder, url, appPath);
         }
@@ -184,6 +184,16 @@ class AppCommand {
                     var p = path.join(appPath, v);
                     var s = me.read(p);
                     s = s.replace(new RegExp(config.localize.src, 'g'), config.localize.des);
+                    fs.writeFileSync(p, s);
+                });
+            }
+        }
+        else {
+            if (config.localize && config.localize.replace) {
+                config.localize.replace.forEach((v, i, arr) => {
+                    var p = path.join(appPath, v);
+                    var s = me.read(p);
+                    s = s.replace(new RegExp(config.localize.des, 'g'), config.localize.src);
                     fs.writeFileSync(p, s);
                 });
             }
