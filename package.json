@@ -2,7 +2,7 @@
   "name": "layanative",
   "version": "1.1.9",
   "description": "laya native tools",
-  "main": "index.js",
+  "main": "./out/index.js",
   "bin": {
     "layanative": "./out/main.js"
   },
