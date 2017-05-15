@@ -51,6 +51,7 @@ export class AppCommand {
         if (fs.existsSync(path.join(appPath, config["res"]["path"], 'stand.alone.version'))) {
             if (url === '' || url === undefined) {
                 url = STAND_ALONE_URL;
+                console.log('您正在打包单机版...');
             }
             else {
                 if (url === STAND_ALONE_URL) {
@@ -102,7 +103,7 @@ export class AppCommand {
             console.log("错误 :找不到目录 " + appPath);
             return false;
         }
-        
+
         fs_extra.removeSync(path.join(appPath, config["res"]["path"]));
 
         return true;

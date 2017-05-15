@@ -54,6 +54,7 @@ class AppCommand {
         if (fs.existsSync(path.join(appPath, config["res"]["path"], 'stand.alone.version'))) {
             if (url === '' || url === undefined) {
                 url = exports.STAND_ALONE_URL;
+                console.log('您正在打包单机版...');
             }
             else {
                 if (url === exports.STAND_ALONE_URL) {

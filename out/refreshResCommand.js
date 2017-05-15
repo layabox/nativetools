@@ -43,7 +43,7 @@ exports.handler = function (argv) {
         if (!nativeJSON || !nativeJSON.h5) {
             console.log('错误: 文件 ' + nativeJSONPath + ' 无效');
         }
-        let folder = path.join(process.cwd(), nativeJSON.h5);
+        let folder = path.join(path.dirname(nativeJSONPath), nativeJSON.h5);
         let appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_IOS);
         if (fs.existsSync(appPath)) {
             cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_IOS, argv.url, appPath);
