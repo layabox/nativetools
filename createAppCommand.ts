@@ -3,18 +3,24 @@ import * as AppCommand from './appCommand';
 import * as fs from 'fs';
 import * as path from 'path';
 import fs_extra = require('fs-extra');
-
 import * as request from 'request';
 
-export var command = 'create_app'
+export var command = 'createapp'
 export var describe = '创建app项目'
 export var builder = {
   folder:
   {
     alias: 'f',
-    //required: true,
+    required: true,
     requiresArg: true,
     description: 'html5项目目录或资源路径 说明：把游戏资源打包进客户端以减少网络下载,选择本地\n的游戏目录，例如启动index在d:/game/index.html下,那资源路径就是d:/game'
+  },
+  path:
+  {
+    default: '.',
+    required: false,
+    requiresArg: true,
+    description: 'native项目输出路径'
   },
   sdk:
   {
@@ -33,8 +39,8 @@ export var builder = {
   platform:
   {
     alias: 'p',
-    //default: AppCommand.PLATFORM_ANDROID_ALL,
-    //choices: [AppCommand.PLATFORM_ANDROID_ALL, AppCommand.PLATFORM_IOS, AppCommand.PLATFORM_ANDROID_ECLIPSE, AppCommand.PLATFORM_ANDROID_STUDIO],
+    default: AppCommand.PLATFORM_ANDROID_ALL,
+    choices: [AppCommand.PLATFORM_ANDROID_ALL, AppCommand.PLATFORM_IOS, AppCommand.PLATFORM_ANDROID_ECLIPSE, AppCommand.PLATFORM_ANDROID_STUDIO],
     required: false,
     requiresArg: true,
     description: '项目平台 [可选值: ' + AppCommand.PLATFORM_ANDROID_ALL + ', ' + AppCommand.PLATFORM_IOS + ', ' + AppCommand.PLATFORM_ANDROID_ECLIPSE + ', ' + AppCommand.PLATFORM_ANDROID_STUDIO + '] [默认值: ' + AppCommand.PLATFORM_ANDROID_ALL + ']'
@@ -42,8 +48,8 @@ export var builder = {
   type:
   {
     alias: 't',
-    //default: 0,
-    //choices: [0, 1, 2],
+    default: 0,
+    choices: [0, 1, 2],
     required: false,
     requiresArg: true,
     description: '创建类型 [可选值: 0: 不打资源包 1: 打资源包 2: 单机版本] [默认值: 0]'
@@ -58,7 +64,7 @@ export var builder = {
   name:
   {
     alias: 'n',
-    //default: 'LayaBox',
+    default: 'LayaBox',
     required: false,
     requiresArg: true,
     description: '项目名称 说明：native项目的名称 [默认值: LayaBox]'
@@ -66,14 +72,14 @@ export var builder = {
   app_name:
   {
     alias: 'a',
-    //default: 'LayaBox',
+    default: 'LayaBox',
     required: false,
     requiresArg: true,
     description: '应用名称 说明：app安装到手机后显示的名称 [默认值: LayaBox]'
   },
   package_name:
   {
-    //default: 'com.layabox.game',
+    default: 'com.layabox.game',
     required: false,
     requiresArg: true,
     description: '包名 [默认值: com.layabox.game]'
@@ -84,31 +90,10 @@ export var handler = async function (argv) {
   try {
     let cmd = new AppCommand.AppCommand();
 
-    let nativeJSON = null;
-    let nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath(argv.outputPath);
-    if (fs.existsSync(nativeJSONPath)) {
-      nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
-      if (!nativeJSON) {
-        console.log('错误：读取文件 ' + nativeJSONPath + ' 失败');
-        return;
-      }
-
-      if (!fs.existsSync(AppCommand.AppCommand.getNativePath(argv.name, nativeJSON, argv.outputPath))) {
-        console.log('错误：找不到文件 ' + nativeJSON.native);
-        return;
-      }
-    }
-
-
-    if (argv.folder === undefined && !nativeJSON) {
-      console.log('错误：缺少必须的选项：folder');
-      return;
-    }
-    if (argv.folder === undefined && nativeJSON) {
-      argv.folder = nativeJSON.h5;
-    }
     let folder = path.isAbsolute(argv.folder) ? argv.folder : path.join(process.cwd(), argv.folder);
-    //console.log('folder: ' + folder);
+    if (AppCommand.AppCommand.isH5Folder(folder)){
+      folder = AppCommand.AppCommand.getH5BinFolder(folder);
+    }
 
     let sdk;
     if (argv.sdk && argv.version) {
@@ -125,24 +110,20 @@ export var handler = async function (argv) {
       }
 
       if (!argv.sdk && !argv.version) {
-        if (nativeJSON) {
-           sdk = nativeJSON.sdk;
-        }
-        else {
-          if (!AppCommand.AppCommand.isSDKExists(sdkVersionConfig.versionList[0].version)) {//最新版 
-            let zip = path.join(AppCommand.AppCommand.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[0].url));
-            await AppCommand.download(sdkVersionConfig.versionList[0].url, zip, function () {
-              AppCommand.unzip(zip, path.dirname(zip), function (error: Error, stdout: string, stderr: string) {
-                if (error) {
-                  console.log(error.name);
-                  console.log(error.message);
-                  console.log(error.stack);
-                }
-              });
+        if (!AppCommand.AppCommand.isSDKExists(sdkVersionConfig.versionList[0].version)) {//最新版 
+          let zip = path.join(AppCommand.AppCommand.getSDKRootPath(), path.basename(sdkVersionConfig.versionList[0].url));
+          await AppCommand.download(sdkVersionConfig.versionList[0].url, zip, function () {
+            AppCommand.unzip(zip, path.dirname(zip), function (error: Error, stdout: string, stderr: string) {
+              if (error) {
+                console.log(error.name);
+                console.log(error.message);
+                console.log(error.stack);
+              }
             });
-          }
-          sdk = AppCommand.AppCommand.getSDKPath(sdkVersionConfig.versionList[0].version);
+          });
         }
+        sdk = AppCommand.AppCommand.getSDKPath(sdkVersionConfig.versionList[0].version);
+
       }
       else {
         let found = false;
@@ -174,24 +155,32 @@ export var handler = async function (argv) {
       }
     }
 
-    if (!cmd.check(argv, nativeJSON)) {
-      return;
+    if (argv.type === 2 && argv.url) {
+      console.log("警告： 单机版不需要参数url");
     }
-
-    if (!nativeJSON) {
-      nativeJSON = { h5: path.relative(path.dirname(nativeJSONPath), folder), native: argv.name };
+    if (argv.type === 0 || argv.type === 1) {
+      if (!argv.url || argv.url === '') {
+        console.log('错误：缺少参数--url');
+        return;
+      }
+      if (argv.url === AppCommand.STAND_ALONE_URL) {
+        console.log('错误：请提供有效参数--url');
+        return;
+      }
     }
 
     if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
-      nativeJSON.sdk = sdk;
-      cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON, argv.outputPath);
-      cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON, argv.outputPath);
-      cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON, argv.outputPath);
+      cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_IOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
+      cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
+      cmd.excuteCreateApp(folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
     }
     else {
-      nativeJSON.sdk = sdk;
-      cmd.excuteCreateApp(folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, nativeJSON, argv.outputPath);
+      cmd.excuteCreateApp(folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
     }
+
+    let nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath(path.join(argv.path, argv.name));
+    let nativeJSON = { h5: path.relative(path.dirname(nativeJSONPath), folder) };
+    fs_extra.writeJSONSync(nativeJSONPath, nativeJSON);
   }
   catch (error) {
     console.log();

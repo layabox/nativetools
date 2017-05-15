@@ -24,15 +24,13 @@ export class AppCommand {
 
     constructor() {
     }
-    public excuteRefreshApp(folder: string, platform: string, type: number, url: string, name: string, nativeJSON: any): boolean {
+    public excuteRefreshRes(folder: string, platform: string, url: string, appPath: string): boolean {
         if (!fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
             return false;
         }
 
         var me = this;
-        let appPath = AppCommand.getAppPath(name, platform, nativeJSON,null);
-
 
         let configPath = path.join(appPath, "config.json");
         if (!fs.existsSync(configPath)) {
@@ -50,28 +48,66 @@ export class AppCommand {
             return false;
         }
 
-        if (type === 2) {
-            url = STAND_ALONE_URL;
+        if (fs.existsSync(path.join(appPath, config["res"]["path"], 'stand.alone.version'))) {
+            if (url === '' || url === undefined) {
+                url = STAND_ALONE_URL;
+            }
+            else {
+                if (url === STAND_ALONE_URL) {
+                    console.log('您正在打包单机版...');
+                }
+                else {
+                    console.log('您正在从单机版地址切换到网络版...');
+                }
+            }
         }
-
-        this.processUrl(config, type, url, appPath);
-
+        else {
+            if (url === '' || url === undefined) {
+                console.log('错误: 缺少参数url，请重新输入 ');
+                return false;
+            }
+            else {
+                if (url === STAND_ALONE_URL) {
+                    console.log('您正在打包单机版...');
+                }
+                else {
+                    console.log('您正在从网络版地址切换到单机版...');
+                }
+            }
+        }
         fs_extra.removeSync(path.join(appPath, config["res"]["path"]));
-
-        if (type === 1 || type === 2) {
-            this.processDcc(config, folder, url, appPath);
+        this.processDcc(config, folder, url, appPath);
+        return true;
+    }
+    public excuteRemoveRes(folder: string, platform: string, url: string, appPath: string): boolean {
+        if (!fs.existsSync(folder)) {
+            console.log('错误: 找不到目录 ' + folder);
+            return false;
         }
 
+        var me = this;
 
-        nativeJSON.type = type;
-        nativeJSON.url = url;
-        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(null), nativeJSON);
+        let configPath = path.join(appPath, "config.json");
+        if (!fs.existsSync(configPath)) {
+            console.log('错误: 找不到文件 ' + configPath);
+            return false;
+        }
+        let config = fs_extra.readJSONSync(configPath);
+        if (!config) {
+            console.log('错误: 读取文件 ' + configPath + ' 失败');
+            return false;
+        }
+
+        if (!fs.existsSync(appPath)) {
+            console.log("错误 :找不到目录 " + appPath);
+            return false;
+        }
+        
+        fs_extra.removeSync(path.join(appPath, config["res"]["path"]));
 
         return true;
     }
-    public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, nativeJSON: any, outputPath: string): boolean {
-        //console.log('platform: ' + platform);
-        //console.log('sdk: ' + path.join(sdk, platform));
+    public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, outputPath: string): boolean {
 
         if (!fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
@@ -79,14 +115,14 @@ export class AppCommand {
         }
 
         var me = this;
-        let appPath = AppCommand.getAppPath(name, platform, nativeJSON, outputPath);
+        let appPath = AppCommand.getAppPath(AppCommand.getNativePath(path.join(outputPath, name)), platform);
 
-
-        let configPath = path.join(path.join(sdk, platform), "config.json");
+        let configPath = path.isAbsolute(sdk) ? path.join(path.join(sdk, platform), "config.json") : path.join(path.join(process.cwd(), sdk, platform), "config.json");
         if (!fs.existsSync(configPath)) {
-            console.log('错误: 找不到文件 ' + configPath + '。SDK文件可能已被删除，请重新下载');
+            console.log('错误: 找不到文件 ' + configPath + '。不是有效的SDK目录');
             return false;
         }
+
         let config = fs_extra.readJSONSync(configPath);
         if (!config) {
             console.log('错误: 读取文件 ' + configPath + ' 失败');
@@ -111,94 +147,11 @@ export class AppCommand {
         }
         this.processDisplayName(config, platform, app_name, appPath);
         this.processName(config, name, appPath);
-        this.processConfig(config, name, appPath);
 
-        nativeJSON.type = type;
-        nativeJSON.url = url;
-        nativeJSON.name = name;
-        nativeJSON.app_name = app_name;
-        nativeJSON.package_name = package_name;
+        let newConfigPath = path.join(appPath, "config.json");
+        config["res"]["path"] = config["res"]["path"].replace(config["template"]["name"], name);
+        fs_extra.writeJSONSync(newConfigPath, config);
 
-        fs_extra.writeJSONSync(AppCommand.getNativeJSONPath(outputPath), nativeJSON);
-
-        return true;
-    }
-    public check(argv: any, nativeJSON: any): boolean {
-
-        if (argv.platform === undefined) {
-            argv.platform = PLATFORM_ANDROID_ALL;
-        }
-        else {
-            if (argv.platform !== PLATFORM_ANDROID_ALL && argv.platform !== PLATFORM_IOS && argv.platform != PLATFORM_ANDROID_ECLIPSE && argv.platform != PLATFORM_ANDROID_STUDIO) {
-                console.log('无效的选项值：');
-                console.log('  选项名称: platform, 传入的值: ' + argv.platform + ', 可选的值：' + PLATFORM_ANDROID_ALL
-                    + ',' + PLATFORM_IOS + ',' + PLATFORM_ANDROID_ECLIPSE + ',' + PLATFORM_ANDROID_STUDIO);
-                return false;
-            }
-        }
-
-        if (argv.type === 2 && argv.url) {
-            console.log("警告： 单机版不需要参数url");
-        }
-        if (argv.type === undefined) {
-            if (nativeJSON && nativeJSON.type) {
-                argv.type = nativeJSON.type;
-            }
-            else {
-                argv.type = DEFAULT_TYPE;
-            }
-        }
-        else {
-
-            if (argv.type !== 0 && argv.type !== 1 && argv.type != 2) {
-                console.log('无效的选项值：');
-                console.log('  选项名称: type, 传入的值: ' + argv.type + ', 可选的值： 0, 1, 2');
-                return false;
-            }
-        }
-        //console.log('type: ' + argv.type);
-
-        if (!argv.url) {
-            if (nativeJSON && nativeJSON.url) {
-                argv.url = nativeJSON.url;
-            }
-        }
-        if (argv.type === 0 || argv.type === 1) {
-            if (!argv.url || argv.url === '') {
-                console.log('错误：缺少参数--url');
-                return false;
-            }
-            if (argv.url === STAND_ALONE_URL) {
-                console.log('错误：请提供有效参数--url');
-                return false;
-            }
-        }
-
-        if (!argv.name) {
-            if (nativeJSON && nativeJSON.name) {
-                argv.name = nativeJSON.name;
-            }
-            else {
-                argv.name = DEFAULT_NAME;
-            }
-        }
-
-        if (!argv.app_name) {
-            if (nativeJSON && nativeJSON.app_name) {
-                argv.app_name = nativeJSON.app_name;
-            }
-            else {
-                argv.app_name = DEFAULT_APP_NAME;
-            }
-        }
-        if (!argv.package_name) {
-            if (nativeJSON && nativeJSON.package_name) {
-                argv.package_name = nativeJSON.package_name;
-            }
-            else {
-                argv.package_name = DEFAULT_PACKAGE_NAME;
-            }
-        }
         return true;
     }
     private processUrl(config: any, type: number, url: string, appPath: string) {
@@ -214,17 +167,6 @@ export class AppCommand {
                 });
             }
         }
-        else {
-            if (config.localize && config.localize.replace) {
-                config.localize.replace.forEach((v, i, arr) => {
-                    var p = path.join(appPath, v);
-                    var s = me.read(p);
-                    s = s.replace(new RegExp(config.localize.des, 'g'), config.localize.src);
-                    fs.writeFileSync(p, s);
-                });
-            }
-        }
-
         if (url && url != "") {
             config["url"]["replace"].forEach(function (file) {
                 var srcPath = path.join(appPath, file);
@@ -233,7 +175,6 @@ export class AppCommand {
                 fs_extra.outputFileSync(srcPath, str);
             });
         }
-        //console.log('url: ' + url);
     }
     private processPackageName(config: any, package_name: string, appPath: string) {
         //替换包名
@@ -246,7 +187,6 @@ export class AppCommand {
                 fs_extra.outputFileSync(destPath, str);
             });
         }
-        //console.log('package_name: ' + package_name);
     }
     private processDcc(config: any, folder: string, url: string, appPath: string) {
         let res_path = AppCommand.getResFolder(folder);//获取资源目录
@@ -273,6 +213,7 @@ export class AppCommand {
             if (!fs.existsSync(outpath)) {
                 fs_extra.mkdirsSync(outpath);
             }
+            console.log('正在执行LayaDcc...');
             gen_dcc.gendcc(res_path, outpath, true, false);
         }
     }
@@ -308,7 +249,6 @@ export class AppCommand {
             }
         }
         fs_extra.outputFileSync(file, doc.toString());
-        //console.log('app_name: ' + app_name);
     }
     private processName(config: any, name: string, appPath: string) {
         var me = this;
@@ -329,55 +269,19 @@ export class AppCommand {
             newPath = path.join(dir_name, new_base_name);
             fs.renameSync(oldPath, newPath);
         });
-        //console.log('name: ' + name);
     }
-    private processConfig(config: any, name: string, appPath: string) {
-        let newConfigPath = path.join(appPath, "config.json");
-        let newConfig = fs_extra.readJSONSync(newConfigPath);
-        if (!newConfig) {
-            console.log('错误: 读取文件 ' + newConfigPath + ' 失败');
-            return false;
-        }
-        for (var i = 0; i < config["url"]["replace"].length; i++) {
-            newConfig["url"]["replace"][i] = newConfig["url"]["replace"][i].replace(config["template"]["name"], name);
-        }
-        for (var i = 0; i < config["localize"]["replace"].length; i++) {
-            newConfig["localize"]["replace"][i] = newConfig["localize"]["replace"][i].replace(config["template"]["name"], name);
-        }
-        newConfig["res"]["path"] = newConfig["res"]["path"].replace(config["template"]["name"], name);
-        fs_extra.writeJSONSync(newConfigPath, newConfig);
+    static getAppPath(dir: string, platform: string): string {
+        if (path.isAbsolute(dir))
+            return path.join(dir, platform);
+        return path.join(process.cwd(), dir, platform);
     }
-    static getAppPath(name: string, platform: string, nativeJSON: any, outputPath: string): string {
-        if (outputPath) {
-            if (path.isAbsolute(outputPath))
-                return path.join(outputPath, name, platform);
-            else
-                return path.join(process.cwd(), outputPath, name, platform);
-        }
-        else {
-            if (nativeJSON && nativeJSON.native) {
-                return path.join(path.join(process.cwd(), nativeJSON.native), platform);
-            }
-            return path.join(path.join(process.cwd(), name), platform);
-        }
+    static getNativeJSONPath(dir: string): string {
+        return path.join(this.getNativePath(dir), NATIVE_JSON_FILE_NAME);
     }
-    static getNativeJSONPath(outputPath: string): string {
-        if (outputPath) {
-            if (path.isAbsolute(outputPath))
-                return path.join(outputPath, NATIVE_JSON_FILE_NAME);
-            else
-                return path.join(process.cwd(), outputPath, NATIVE_JSON_FILE_NAME);
-        }
-        return path.join(process.cwd(), NATIVE_JSON_FILE_NAME);
-    }
-    static getNativePath(name: string, nativeJSON: any, outputPath: string): string {
-        if (outputPath) {
-            if (path.isAbsolute(outputPath))
-                return path.join(outputPath, name);
-            else
-                return path.join(process.cwd(), outputPath, name);
-        }
-        return path.join(process.cwd(), nativeJSON.native);
+    static getNativePath(dir: string): string {
+        if (path.isAbsolute(dir))
+            return dir;
+        return path.join(process.cwd(), dir);
     }
     static isH5Folder(folder: string): boolean {
         return fs.existsSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
@@ -400,7 +304,7 @@ export class AppCommand {
         }
         else {
             var appdata = process.env.AppData || process.env.USERPROFILE + "/AppData/Roaming/";
-            dataPath = appdata + "/Laya/NativeTools/template/";
+            dataPath = appdata + "/Laya/layanative/template/";
         }
         if (!fs_extra.existsSync(dataPath)) {
             fs_extra.mkdirsSync(dataPath);

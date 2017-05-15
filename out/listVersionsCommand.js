@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const AppCommand = require("./appCommand");
-exports.command = 'list_versions';
+exports.command = 'listversions';
 exports.describe = '列出所有SDK版本';
 exports.handler = function (argv) {
     return __awaiter(this, void 0, void 0, function* () {

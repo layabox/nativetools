@@ -1,6 +1,6 @@
 import * as AppCommand from './appCommand';
 import * as fs from 'fs';
-exports.command = 'list_versions'
+exports.command = 'listversions'
 exports.describe = '列出所有SDK版本'
 
 exports.handler = async function (argv) {

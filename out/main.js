@@ -2,25 +2,30 @@
 if (process.argv.length === 2) {
   console.log();
   console.log('用法：');
-  console.log('   layanative create_app [OPTIONS]');
-  console.log('   layanative refresh_app [OPTIONS]');
-  console.log('   layanative list_versions');
+  console.log('   layanative createapp [OPTIONS]');
+  console.log('   layanative refreshres [OPTIONS]');
+  console.log('   layanative removeres [OPTIONS]');
+  console.log('   layanative listversions');
   console.log('描述：');
-  console.log('   create_app');
+  console.log('   createapp');
   console.log('       创建一个runtime项目。');
-  console.log('       具体帮助信息用 layanative create_app --help 查看。');
-  console.log('   refresh_app');
-  console.log('       刷新当前目录对应的项目的资源和配置。');
-  console.log('       具体帮助信息用 layanative refresh_app --help 查看。');
-  console.log('   list_versions');
+  console.log('       具体帮助信息用 layanative createapp --help 查看。');
+  console.log('   refreshres');
+  console.log('       刷新当前目录对应的项目的资源。');
+  console.log('       具体帮助信息用 layanative refreshres --help 查看。');
+  console.log('   removeres');
+  console.log('       删除当前目录对应的项目的资源。');
+  console.log('       具体帮助信息用 layanative removeres --help 查看。');
+  console.log('   listversions');
   console.log('       列出所有可用SDK版本。');
-  console.log('       具体帮助信息用 layanative list_versions --help 查看。');
+  console.log('       具体帮助信息用 layanative listversions --help 查看。');
   return;
 }
 
 require('yargs')
   .command(require('./createAppCommand'))
-  .command(require('./refreshAppCommand'))
+  .command(require('./refreshResCommand'))
+  .command(require('./removeResCommand'))
   .command(require('./listVersionsCommand'))
   .locale('zh_CN')
   .help()
