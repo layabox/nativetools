@@ -41,6 +41,9 @@ exports.handler = function (argv) {
         }
     }
     catch (error) {
+        if (error.code === 'EPERM') {
+            console.log('错误：文件已经被使用或被其他程序打开');
+        }
         console.log();
         console.log(error.name);
         console.log(error.message);

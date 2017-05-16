@@ -64,7 +64,7 @@ exports.handler = function (argv) {
       if (fs.existsSync(appPath)) {
         cmd.excuteRefreshRes(folder, argv.url, appPath);
       }
-      else{
+      else {
         console.log('错误：找不到目录' + appPath);
       }
 
@@ -72,7 +72,7 @@ exports.handler = function (argv) {
       if (fs.existsSync(appPath)) {
         cmd.excuteRefreshRes(folder, argv.url, appPath);
       }
-      else{
+      else {
         console.log('错误：找不到目录' + appPath);
       }
 
@@ -80,7 +80,7 @@ exports.handler = function (argv) {
       if (fs.existsSync(appPath)) {
         cmd.excuteRefreshRes(folder, argv.url, appPath);
       }
-      else{
+      else {
         console.log('错误：找不到目录' + appPath);
       }
     }
@@ -89,7 +89,7 @@ exports.handler = function (argv) {
       if (fs.existsSync(appPath)) {
         cmd.excuteRefreshRes(folder, argv.url, appPath);
       }
-      else{
+      else {
         console.log('错误：找不到目录' + appPath);
       }
     }
@@ -97,6 +97,9 @@ exports.handler = function (argv) {
   }
   catch (error) {
     console.log();
+    if (error.code === 'EPERM') {
+      console.log('错误：文件已经被使用或被其他程序打开');
+    }
     console.log(error.name);
     console.log(error.message);
   }
