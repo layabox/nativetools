@@ -52,14 +52,14 @@ export var builder = {
     choices: [0, 1, 2],
     required: false,
     requiresArg: true,
-    description: '创建类型 [可选值: 0: 不打资源包 1: 打资源包 2: 单机版本] [默认值: 0]'
+    description: '创建类型 说明：0: 不打资源包 1: 打资源包 2: 单机版本'
   },
   url:
   {
     alias: 'u',
     required: false,
     requiresArg: true,
-    description: '游戏地址 [当t为0或者1的时候，必须填，当t为2的时候，不用填写]'
+    description: '游戏地址 说明：当t为0或者1的时候，必须填，当t为2的时候，不用填写'
   },
   name:
   {
@@ -67,7 +67,7 @@ export var builder = {
     default: 'LayaBox',
     required: false,
     requiresArg: true,
-    description: '项目名称 说明：native项目的名称 [默认值: LayaBox]'
+    description: '项目名称 说明：native项目的名称'
   },
   app_name:
   {
@@ -75,14 +75,14 @@ export var builder = {
     default: 'LayaBox',
     required: false,
     requiresArg: true,
-    description: '应用名称 说明：app安装到手机后显示的名称 [默认值: LayaBox]'
+    description: '应用名称 说明：app安装到手机后显示的名称'
   },
   package_name:
   {
     default: 'com.layabox.game',
     required: false,
     requiresArg: true,
-    description: '包名 [默认值: com.layabox.game]'
+    description: '包名'
   }
 }
 
