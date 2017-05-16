@@ -98,7 +98,9 @@ class AppCommand {
             console.log("错误 :找不到目录 " + appPath);
             return false;
         }
-        fs_extra.removeSync(path.join(appPath, config["res"]["path"]));
+        let dir = path.join(appPath, config["res"]["path"]);
+        console.log('正在删除 ' + dir + ' ...');
+        fs_extra.removeSync(dir);
         return true;
     }
     excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, outputPath) {

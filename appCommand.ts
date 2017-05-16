@@ -98,7 +98,9 @@ export class AppCommand {
             return false;
         }
 
-        fs_extra.removeSync(path.join(appPath, config["res"]["path"]));
+        let dir = path.join(appPath, config["res"]["path"]);
+        console.log('正在删除 ' + dir + ' ...');
+        fs_extra.removeSync(dir);
 
         return true;
     }
