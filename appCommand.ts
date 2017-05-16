@@ -69,10 +69,10 @@ export class AppCommand {
             }
             else {
                 if (url === STAND_ALONE_URL) {
-                    console.log('您正在打包单机版...');
+                    console.log('您正在从网络版地址切换到单机版...');
                 }
                 else {
-                    console.log('您正在从网络版地址切换到单机版...');
+                    console.log('您正在打包网络版...');
                 }
             }
         }
