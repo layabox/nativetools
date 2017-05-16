@@ -40,8 +40,13 @@ exports.handler = function (argv) {
     nativePath = AppCommand.AppCommand.getNativePath(argv.path);
     nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath(argv.path);
 
+    if (!fs.existsSync(nativePath)) {
+      console.log('错误: 找不到目录 ' + nativePath);
+      return;
+    }
+
     if (!fs.existsSync(nativeJSONPath)) {
-      console.log('错误: 目录' + path.dirname(nativeJSONPath) + ' 不是项目目录或已损坏');
+      console.log('错误: 找不到文件 ' + nativeJSONPath);
       return;
     }
 
@@ -53,20 +58,42 @@ exports.handler = function (argv) {
 
     let folder = path.join(path.dirname(nativeJSONPath), nativeJSON.h5);
 
-    let appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_IOS);
-    if (fs.existsSync(appPath)) {
-      cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_IOS, argv.url, appPath);
+    if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
+
+      let appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_IOS);
+      if (fs.existsSync(appPath)) {
+        cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_IOS, argv.url, appPath);
+      }
+      else{
+        console.log('错误：找不到目录' + appPath);
+      }
+
+      appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_ANDROID_ECLIPSE);
+      if (fs.existsSync(appPath)) {
+        cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.url, appPath);
+      }
+      else{
+        console.log('错误：找不到目录' + appPath);
+      }
+
+      appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_ANDROID_STUDIO);
+      if (fs.existsSync(appPath)) {
+        cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_ANDROID_STUDIO, argv.url, appPath);
+      }
+      else{
+        console.log('错误：找不到目录' + appPath);
+      }
+    }
+    else {
+      let appPath = AppCommand.AppCommand.getAppPath(nativePath, argv.platform);
+      if (fs.existsSync(appPath)) {
+        cmd.excuteRefreshRes(folder, argv.platform, argv.url, appPath);
+      }
+      else{
+        console.log('错误：找不到目录' + appPath);
+      }
     }
 
-    appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_ANDROID_ECLIPSE);
-    if (fs.existsSync(appPath)) {
-      cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.url, appPath);
-    }
-
-    appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_ANDROID_STUDIO);
-    if (fs.existsSync(appPath)) {
-      cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_ANDROID_STUDIO, argv.url, appPath);
-    }
   }
   catch (error) {
     console.log();
