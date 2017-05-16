@@ -24,7 +24,7 @@ export class AppCommand {
 
     constructor() {
     }
-    public excuteRefreshRes(folder: string, platform: string, url: string, appPath: string): boolean {
+    public excuteRefreshRes(folder: string, url: string, appPath: string): boolean {
         if (!fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
             return false;
@@ -80,13 +80,7 @@ export class AppCommand {
         this.processDcc(config, folder, url, appPath);
         return true;
     }
-    public excuteRemoveRes(folder: string, platform: string, url: string, appPath: string): boolean {
-        if (!fs.existsSync(folder)) {
-            console.log('错误: 找不到目录 ' + folder);
-            return false;
-        }
-
-        var me = this;
+    public excuteRemoveRes(appPath: string): boolean {
 
         let configPath = path.join(appPath, "config.json");
         if (!fs.existsSync(configPath)) {

@@ -31,7 +31,7 @@ exports.H5_PROJECT_CONFIG_FILE = 'config.json';
 class AppCommand {
     constructor() {
     }
-    excuteRefreshRes(folder, platform, url, appPath) {
+    excuteRefreshRes(folder, url, appPath) {
         if (!fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
             return false;
@@ -83,12 +83,7 @@ class AppCommand {
         this.processDcc(config, folder, url, appPath);
         return true;
     }
-    excuteRemoveRes(folder, platform, url, appPath) {
-        if (!fs.existsSync(folder)) {
-            console.log('错误: 找不到目录 ' + folder);
-            return false;
-        }
-        var me = this;
+    excuteRemoveRes(appPath) {
         let configPath = path.join(appPath, "config.json");
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath);

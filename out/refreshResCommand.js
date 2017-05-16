@@ -51,21 +51,21 @@ exports.handler = function (argv) {
         if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
             let appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_IOS);
             if (fs.existsSync(appPath)) {
-                cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_IOS, argv.url, appPath);
+                cmd.excuteRefreshRes(folder, argv.url, appPath);
             }
             else {
                 console.log('错误：找不到目录' + appPath);
             }
             appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_ANDROID_ECLIPSE);
             if (fs.existsSync(appPath)) {
-                cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.url, appPath);
+                cmd.excuteRefreshRes(folder, argv.url, appPath);
             }
             else {
                 console.log('错误：找不到目录' + appPath);
             }
             appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_ANDROID_STUDIO);
             if (fs.existsSync(appPath)) {
-                cmd.excuteRefreshRes(folder, AppCommand.PLATFORM_ANDROID_STUDIO, argv.url, appPath);
+                cmd.excuteRefreshRes(folder, argv.url, appPath);
             }
             else {
                 console.log('错误：找不到目录' + appPath);
@@ -74,7 +74,7 @@ exports.handler = function (argv) {
         else {
             let appPath = AppCommand.AppCommand.getAppPath(nativePath, argv.platform);
             if (fs.existsSync(appPath)) {
-                cmd.excuteRefreshRes(folder, argv.platform, argv.url, appPath);
+                cmd.excuteRefreshRes(folder, argv.url, appPath);
             }
             else {
                 console.log('错误：找不到目录' + appPath);
