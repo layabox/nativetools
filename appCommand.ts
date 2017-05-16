@@ -153,6 +153,10 @@ export class AppCommand {
         config["res"]["path"] = config["res"]["path"].replace(config["template"]["name"], name);
         fs_extra.writeJSONSync(newConfigPath, config);
 
+        let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
+        let nativeJSON = { h5: path.relative(path.dirname(nativeJSONPath), folder) };
+        fs_extra.writeJSONSync(nativeJSONPath, nativeJSON);
+
         return true;
     }
     private processUrl(config: any, type: number, url: string, appPath: string) {

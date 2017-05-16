@@ -141,6 +141,9 @@ class AppCommand {
         let newConfigPath = path.join(appPath, "config.json");
         config["res"]["path"] = config["res"]["path"].replace(config["template"]["name"], name);
         fs_extra.writeJSONSync(newConfigPath, config);
+        let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
+        let nativeJSON = { h5: path.relative(path.dirname(nativeJSONPath), folder) };
+        fs_extra.writeJSONSync(nativeJSONPath, nativeJSON);
         return true;
     }
     processUrl(config, type, url, appPath) {

@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const AppCommand = require("./appCommand");
 const path = require("path");
-const fs_extra = require("fs-extra");
 exports.command = 'createapp';
 exports.describe = '创建app项目';
 exports.builder = {
@@ -44,7 +43,7 @@ exports.builder = {
         choices: [AppCommand.PLATFORM_ANDROID_ALL, AppCommand.PLATFORM_IOS, AppCommand.PLATFORM_ANDROID_ECLIPSE, AppCommand.PLATFORM_ANDROID_STUDIO],
         required: false,
         requiresArg: true,
-        description: '项目平台 [可选值: ' + AppCommand.PLATFORM_ANDROID_ALL + ', ' + AppCommand.PLATFORM_IOS + ', ' + AppCommand.PLATFORM_ANDROID_ECLIPSE + ', ' + AppCommand.PLATFORM_ANDROID_STUDIO + '] [默认值: ' + AppCommand.PLATFORM_ANDROID_ALL + ']'
+        description: '项目平台'
     },
     type: {
         alias: 't',
@@ -167,9 +166,6 @@ exports.handler = function (argv) {
             else {
                 cmd.excuteCreateApp(folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
             }
-            let nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath(path.join(argv.path, argv.name));
-            let nativeJSON = { h5: path.relative(path.dirname(nativeJSONPath), folder) };
-            fs_extra.writeJSONSync(nativeJSONPath, nativeJSON);
         }
         catch (error) {
             console.log();
