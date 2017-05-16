@@ -289,7 +289,7 @@ export class AppCommand {
     }
     static getH5BinFolder(folder: string): string {
         let config = fs_extra.readJSONSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
-        return path.join(folder, config.resource);
+        return path.join(folder, config.res);
     }
     static getResFolder(folder: string): string {
         if (AppCommand.isH5Folder(folder)) {
