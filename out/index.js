@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const createAppCommand_1 = require("./createAppCommand");
 module.exports = {
-    create_app: (folder, sdk, version, platform, type, url, name, app_name, package_name, outputPath) => {
+    create_app: (folder, sdk, version, platform, type, url, name, app_name, package_name, path) => {
         var args = {
             folder: folder,
             sdk: sdk,
@@ -13,12 +13,24 @@ module.exports = {
             name: name,
             app_name: app_name,
             package_name: package_name,
-            outputPath: outputPath
+            path: path
         };
         createAppCommand_1.handler(args);
     },
-    refresh_app: () => {
+    refreshres: (platform, path, url) => {
+        var args = {
+            platform: platform,
+            path: path,
+            url: url
+        };
+        createAppCommand_1.handler(args);
     },
-    list_versions: () => {
+    removeres: (path) => {
+        var args = {
+            path: path
+        };
+        createAppCommand_1.handler(args);
+    },
+    listversions: () => {
     }
 };

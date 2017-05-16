@@ -19,7 +19,7 @@ exports.builder = {
         default: '.',
         required: false,
         requiresArg: true,
-        description: 'native项目输出路径'
+        description: 'native路径'
     },
     url: {
         alias: 'u',

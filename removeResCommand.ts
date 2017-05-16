@@ -7,6 +7,12 @@ import fs_extra = require('fs-extra');
 exports.command = 'removeres';
 exports.describe = '删除app缓存资源'
 exports.builder = {
+    path: {
+        default: '.',
+        required: false,
+        requiresArg: true,
+        description: 'native项目输出路径'
+    }
 }
 
 exports.handler = function (argv) {
