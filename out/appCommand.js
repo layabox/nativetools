@@ -37,6 +37,10 @@ class AppCommand {
             return false;
         }
         var me = this;
+        if (!fs.existsSync(appPath)) {
+            console.log("警告 :找不到目录 " + appPath);
+            return false;
+        }
         let configPath = path.join(appPath, "config.json");
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath);
@@ -45,10 +49,6 @@ class AppCommand {
         let config = fs_extra.readJSONSync(configPath);
         if (!config) {
             console.log('错误: 读取文件 ' + configPath + ' 失败');
-            return false;
-        }
-        if (!fs.existsSync(appPath)) {
-            console.log("警告 :找不到目录 " + appPath);
             return false;
         }
         if (fs.existsSync(path.join(appPath, config["res"]["path"], 'stand.alone.version'))) {
@@ -85,6 +85,10 @@ class AppCommand {
     }
     excuteRemoveRes(appPath) {
         let configPath = path.join(appPath, "config.json");
+        if (!fs.existsSync(appPath)) {
+            console.log("警告 :找不到目录 " + appPath);
+            return false;
+        }
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath);
             return false;
@@ -92,10 +96,6 @@ class AppCommand {
         let config = fs_extra.readJSONSync(configPath);
         if (!config) {
             console.log('错误: 读取文件 ' + configPath + ' 失败');
-            return false;
-        }
-        if (!fs.existsSync(appPath)) {
-            console.log("警告 :找不到目录 " + appPath);
             return false;
         }
         let dir = path.join(appPath, config["res"]["path"]);
