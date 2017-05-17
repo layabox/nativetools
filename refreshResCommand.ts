@@ -20,7 +20,7 @@ exports.builder = {
     default: '.',
     required: false,
     requiresArg: true,
-    description: 'native路径'
+    description: 'native项目路径'
   },
   url:
   {
