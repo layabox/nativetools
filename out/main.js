@@ -21,7 +21,9 @@ if (process.argv.length === 2) {
   console.log('       具体帮助信息用 layanative listversions --help 查看。');
   return;
 }
-
+if (process.argv.length > 2 && process.argv[2] !== 'createapp' &&　process.argv[2] !== 'refreshres'　&& process.argv[2] !== 'removeres' && process.argv[2] !== 'listversions'){
+  console.log('错误： 命令 ' + process.argv[2] + ' 不存在，请重新输入');
+}
 require('yargs')
   .command(require('./createAppCommand'))
   .command(require('./refreshResCommand'))
