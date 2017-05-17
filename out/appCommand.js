@@ -38,7 +38,7 @@ class AppCommand {
         }
         var me = this;
         if (!fs.existsSync(appPath)) {
-            console.log("警告 :找不到目录 " + appPath);
+            console.log("警告: 找不到目录 " + appPath);
             return false;
         }
         let configPath = path.join(appPath, "config.json");
@@ -86,7 +86,7 @@ class AppCommand {
     excuteRemoveRes(appPath) {
         let configPath = path.join(appPath, "config.json");
         if (!fs.existsSync(appPath)) {
-            console.log("警告 :找不到目录 " + appPath);
+            console.log("警告: 找不到目录 " + appPath);
             return false;
         }
         if (!fs.existsSync(configPath)) {
