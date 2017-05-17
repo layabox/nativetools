@@ -169,6 +169,9 @@ exports.handler = function (argv) {
         }
         catch (error) {
             console.log();
+            if (error.code === 'ETIMEDOUT') {
+                console.log('错误：网络连接超时');
+            }
             console.log(error.name);
             console.log(error.message);
         }

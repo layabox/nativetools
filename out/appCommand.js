@@ -48,7 +48,7 @@ class AppCommand {
             return false;
         }
         if (!fs.existsSync(appPath)) {
-            console.log("错误 :找不到目录 " + appPath);
+            console.log("警告 :找不到目录 " + appPath);
             return false;
         }
         if (fs.existsSync(path.join(appPath, config["res"]["path"], 'stand.alone.version'))) {
@@ -61,7 +61,7 @@ class AppCommand {
                     console.log('您正在打包单机版...');
                 }
                 else {
-                    console.log('您正在从单机版地址切换到网络版...');
+                    console.log('您正在从单机版地址切换到网络版,请注意修改相关代码...');
                 }
             }
         }
@@ -72,7 +72,7 @@ class AppCommand {
             }
             else {
                 if (url === exports.STAND_ALONE_URL) {
-                    console.log('您正在从网络版地址切换到单机版...');
+                    console.log('您正在从网络版地址切换到单机版,请注意修改相关代码...');
                 }
                 else {
                     console.log('您正在打包网络版...');
@@ -95,12 +95,12 @@ class AppCommand {
             return false;
         }
         if (!fs.existsSync(appPath)) {
-            console.log("错误 :找不到目录 " + appPath);
+            console.log("警告 :找不到目录 " + appPath);
             return false;
         }
         let dir = path.join(appPath, config["res"]["path"]);
         console.log('正在删除 ' + dir + ' ...');
-        fs_extra.removeSync(dir);
+        fs_extra.emptyDirSync(dir);
         return true;
     }
     excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, outputPath) {
@@ -121,7 +121,7 @@ class AppCommand {
             return false;
         }
         if (fs.existsSync(appPath)) {
-            console.log("警告： 项目 " + appPath + " 已经存在");
+            console.log("错误： 项目 " + appPath + " 已经存在");
             return false;
         }
         fs_extra.copySync(path.join(sdk, platform), appPath);
