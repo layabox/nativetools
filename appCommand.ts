@@ -339,7 +339,7 @@ export async function getServerJSONConfig(url: string): Promise<any> {
                 res(JSON.parse(body));
             }
             else {
-                console.log('错误: ' + response.statusCode + ' 下载 ' + url + ' 错误');
+                console.log('错误: 网络连接异常，下载 ' + url + '失败');
                 res(null);
             }
         })
@@ -369,7 +369,7 @@ export async function download(url: string, file: string, callBack: () => void):
                 res(true);
             }
             else {
-                console.log('错误: ' + layaresponse.statusCode + ' 下载 ' + url + ' 错误');
+                console.log('错误: 网络连接异常，下载 ' + url + '失败');
                 res(false);
             }
         }).on('end', function () {

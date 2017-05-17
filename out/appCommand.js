@@ -315,7 +315,7 @@ function getServerJSONConfig(url) {
                     res(JSON.parse(body));
                 }
                 else {
-                    console.log('错误: ' + response.statusCode + ' 下载 ' + url + ' 错误');
+                    console.log('错误: 网络连接异常，下载 ' + url + '失败');
                     res(null);
                 }
             });
@@ -346,7 +346,7 @@ function download(url, file, callBack) {
                     res(true);
                 }
                 else {
-                    console.log('错误: ' + layaresponse.statusCode + ' 下载 ' + url + ' 错误');
+                    console.log('错误: 网络连接异常，下载 ' + url + '失败');
                     res(false);
                 }
             }).on('end', function () {
