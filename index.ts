@@ -2,7 +2,7 @@
 import { handler } from './createAppCommand';
 
 module.exports = {
-    create_app: (folder: string, sdk: string, version: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, path: string) => {
+    createapp: (folder: string, sdk: string, version: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, path: string) => {
         var args = {
             folder: folder,
             sdk: sdk,
