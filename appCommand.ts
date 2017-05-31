@@ -330,7 +330,8 @@ export class AppCommand {
         return text;
     }
 }
-export async function getServerJSONConfig(url: string): Promise<any> {
+export async function getServerJSONConfig(url?: string): Promise<any> {
+    if(!url) url = exports.VERSION_CONFIG_URL + '?' + Math.random();
     return new Promise<any>(function (res, rej) {
         request(url, function (error, response, body) {
             if (!error && response.statusCode == 200) {
@@ -375,15 +376,30 @@ export async function download(url: string, file: string, callBack: () => void):
         });
     })
 }
-export async function unzip(unzipurl: string, filepath: string, callbackHandler) {
+export function unzip(unzipurl: string, filepath: string, callbackHandler) {
     console.log('正在解压 ' + unzipurl + ' 到 ' + filepath + ' ...');
     if (process.platform === 'darwin') {
-        var cmd = "unzip -o \"" + unzipurl + "\" -d \"" + filepath + "\"";
+        var cmd = "unzip -oq \"" + unzipurl + "\" -d \"" + filepath + "\"";
         child_process.execSync(cmd);
     }
     else {
         var unzipexepath = path.join(__dirname, '..', 'tools', 'unzip.exe');
-        var cmd = "\"" + unzipexepath + "\" -o \"" + unzipurl + "\" -d \"" + filepath + "\"";
+        var cmd = "\"" + unzipexepath + "\" -oq \"" + unzipurl + "\" -d \"" + filepath + "\"";
         child_process.execSync(cmd);
+    }
+}
+
+
+export function unzipAsync(unzipurl: string, filepath: string, cb:(error:Error, stdout:string, stderror:string)=>void) {
+    console.log('正在解压 ' + unzipurl + ' 到 ' + filepath + ' ...');
+    //-q 的作用是不要打印具体过程，否则会导致exec出错
+    if (process.platform === 'darwin') {
+        var cmd = "unzip -oq \"" + unzipurl + "\" -d \"" + filepath + "\"";
+        child_process.exec(cmd,{maxBuffer:1024*1024},cb);
+    }
+    else {
+        var unzipexepath = path.join(__dirname, '..', 'tools', 'unzip.exe');
+        var cmd = "\"" + unzipexepath + "\" -oq \"" + unzipurl + "\" -d \"" + filepath + "\"";
+        child_process.exec(cmd,{maxBuffer:1024*1024},cb);
     }
 }

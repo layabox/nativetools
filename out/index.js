@@ -1,5 +1,7 @@
 "use strict";
 const createAppCommand_1 = require("./createAppCommand");
+const AppCommand = require("./appCommand");
+const path = require("path");
 module.exports = {
     createapp: (folder, sdk, version, platform, type, url, name, app_name, package_name, path) => {
         var args = {
@@ -30,6 +32,17 @@ module.exports = {
         };
         createAppCommand_1.handler(args);
     },
-    listversions: () => {
+    listversions: AppCommand.getServerJSONConfig,
+    downloadsdk: (ver) => {
+        let zip = path.join(AppCommand.AppCommand.getSDKRootPath(), ver + '.zip');
+    },
+    isSDKExist: (ver) => {
+        return AppCommand.AppCommand.isSDKExists(ver);
+    },
+    getSDKRootPath: () => {
+        return AppCommand.AppCommand.getSDKRootPath();
+    },
+    unzipAsync: (zipfile, outfile, cb) => {
+        AppCommand.unzipAsync(zipfile, outfile, cb);
     }
 };

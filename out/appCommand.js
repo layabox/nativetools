@@ -308,6 +308,8 @@ class AppCommand {
 exports.AppCommand = AppCommand;
 function getServerJSONConfig(url) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (!url)
+            url = exports.VERSION_CONFIG_URL + '?' + Math.random();
         return new Promise(function (res, rej) {
             request(url, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
@@ -356,17 +358,28 @@ function download(url, file, callBack) {
 }
 exports.download = download;
 function unzip(unzipurl, filepath, callbackHandler) {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log('正在解压 ' + unzipurl + ' 到 ' + filepath + ' ...');
-        if (process.platform === 'darwin') {
-            var cmd = "unzip -o \"" + unzipurl + "\" -d \"" + filepath + "\"";
-            child_process.execSync(cmd);
-        }
-        else {
-            var unzipexepath = path.join(__dirname, '..', 'tools', 'unzip.exe');
-            var cmd = "\"" + unzipexepath + "\" -o \"" + unzipurl + "\" -d \"" + filepath + "\"";
-            child_process.execSync(cmd);
-        }
-    });
+    console.log('正在解压 ' + unzipurl + ' 到 ' + filepath + ' ...');
+    if (process.platform === 'darwin') {
+        var cmd = "unzip -oq \"" + unzipurl + "\" -d \"" + filepath + "\"";
+        child_process.execSync(cmd);
+    }
+    else {
+        var unzipexepath = path.join(__dirname, '..', 'tools', 'unzip.exe');
+        var cmd = "\"" + unzipexepath + "\" -oq \"" + unzipurl + "\" -d \"" + filepath + "\"";
+        child_process.execSync(cmd);
+    }
 }
 exports.unzip = unzip;
+function unzipAsync(unzipurl, filepath, cb) {
+    console.log('正在解压 ' + unzipurl + ' 到 ' + filepath + ' ...');
+    if (process.platform === 'darwin') {
+        var cmd = "unzip -oq \"" + unzipurl + "\" -d \"" + filepath + "\"";
+        child_process.exec(cmd, { maxBuffer: 1024 * 1024 }, cb);
+    }
+    else {
+        var unzipexepath = path.join(__dirname, '..', 'tools', 'unzip.exe');
+        var cmd = "\"" + unzipexepath + "\" -oq \"" + unzipurl + "\" -d \"" + filepath + "\"";
+        child_process.exec(cmd, { maxBuffer: 1024 * 1024 }, cb);
+    }
+}
+exports.unzipAsync = unzipAsync;
