@@ -1,7 +1,6 @@
 import * as AppCommand from './appCommand';
 import * as fs from 'fs';
 import * as path from 'path';
-import fs_extra = require('fs-extra');
 
 
 exports.command = 'refreshres';
@@ -50,7 +49,7 @@ exports.handler = function (argv) {
       return;
     }
 
-    let nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
+    let nativeJSON =  JSON.parse( fs.readFileSync(nativeJSONPath,'utf8'));
 
     if (!nativeJSON || !nativeJSON.h5) {
       console.log('错误: 文件 ' + nativeJSONPath + ' 无效');

@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const fs = require("fs");
 const path = require("path");
-const fs_extra = require("fs-extra");
 const gen_dcc = require("layadcc");
 const request = require("request");
 const child_process = require("child_process");
@@ -27,6 +26,46 @@ exports.PLATFORM_IOS = 'ios';
 exports.PLATFORM_ANDROID_ECLIPSE = 'android_eclipse';
 exports.PLATFORM_ANDROID_STUDIO = 'android_studio';
 exports.H5_PROJECT_CONFIG_FILE = 'config.json';
+function mkdirsSync(dirname, mode) {
+    if (fs.existsSync(dirname)) {
+        return true;
+    }
+    else {
+        if (mkdirsSync(path.dirname(dirname), mode)) {
+            fs.mkdirSync(dirname, mode);
+            return true;
+        }
+    }
+    return false;
+}
+function copyFileSync(source, target) {
+    var targetFile = target;
+    if (fs.existsSync(target)) {
+        if (fs.lstatSync(target).isDirectory()) {
+            targetFile = path.join(target, path.basename(source));
+        }
+    }
+    fs.writeFileSync(targetFile, fs.readFileSync(source));
+}
+function copyFolderRecursiveSync(source, target) {
+    var files = [];
+    var targetFolder = path.join(target, path.basename(source));
+    if (!fs.existsSync(targetFolder)) {
+        mkdirsSync(targetFolder);
+    }
+    if (fs.lstatSync(source).isDirectory()) {
+        files = fs.readdirSync(source);
+        files.forEach(function (file) {
+            var curSource = path.join(source, file);
+            if (fs.lstatSync(curSource).isDirectory()) {
+                copyFolderRecursiveSync(curSource, targetFolder);
+            }
+            else {
+                copyFileSync(curSource, targetFolder);
+            }
+        });
+    }
+}
 class AppCommand {
     constructor() {
     }
@@ -45,7 +84,8 @@ class AppCommand {
             console.log('错误: 找不到文件 ' + configPath);
             return false;
         }
-        let config = fs_extra.readJSONSync(configPath);
+        console.log('REPLACE readjson1 ' + configPath);
+        let config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         if (!config) {
             console.log('错误: 读取文件 ' + configPath + ' 失败');
             return false;
@@ -78,7 +118,8 @@ class AppCommand {
                 }
             }
         }
-        fs_extra.removeSync(path.join(appPath, config["res"]["path"]));
+        console.log("REPLACE rmdir1 " + path.join(appPath, config["res"]["path"]));
+        fs.rmdirSync(path.join(appPath, config["res"]["path"]));
         this.processDcc(config, folder, url, appPath);
         return true;
     }
@@ -92,14 +133,17 @@ class AppCommand {
             console.log('错误: 找不到文件 ' + configPath);
             return false;
         }
-        let config = fs_extra.readJSONSync(configPath);
+        console.log('REPLACE readjson2 ' + configPath);
+        let config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         if (!config) {
             console.log('错误: 读取文件 ' + configPath + ' 失败');
             return false;
         }
         let dir = path.join(appPath, config["res"]["path"]);
         console.log('正在删除 ' + dir + ' ...');
-        fs_extra.emptyDirSync(dir);
+        console.log('REPLACE emptydir1 ' + dir);
+        fs.rmdirSync(dir);
+        mkdirsSync(dir);
         return true;
     }
     excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, outputPath) {
@@ -114,7 +158,8 @@ class AppCommand {
             console.log('错误: 找不到文件 ' + configPath + '。不是有效的SDK目录');
             return false;
         }
-        let config = fs_extra.readJSONSync(configPath);
+        console.log('REPLACE  readjson2', configPath);
+        let config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         if (!config) {
             console.log('错误: 读取文件 ' + configPath + ' 失败');
             return false;
@@ -123,7 +168,8 @@ class AppCommand {
             console.log("错误： 项目 " + appPath + " 已经存在");
             return false;
         }
-        fs_extra.copySync(path.join(sdk, platform), appPath);
+        console.log('REPLACE copydir1 ', path.join(sdk, platform), path.dirname(appPath));
+        copyFolderRecursiveSync(path.join(sdk, platform), path.dirname(appPath));
         if (type === 2) {
             url = exports.STAND_ALONE_URL;
         }
@@ -136,10 +182,12 @@ class AppCommand {
         this.processName(config, name, appPath);
         let newConfigPath = path.join(appPath, "config.json");
         config["res"]["path"] = config["res"]["path"].replace(config["template"]["name"], name);
-        fs_extra.writeJSONSync(newConfigPath, config);
+        console.log('REPLACE  writejson3 ', newConfigPath);
+        fs.writeFileSync(newConfigPath, JSON.stringify(config));
         let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
         let nativeJSON = { h5: path.relative(path.dirname(nativeJSONPath), folder) };
-        fs_extra.writeJSONSync(nativeJSONPath, nativeJSON);
+        console.log('REPLACE writeJSON4', nativeJSONPath);
+        fs.writeFileSync(nativeJSONPath, JSON.stringify(nativeJSON));
         return true;
     }
     processUrl(config, type, url, appPath) {
@@ -159,7 +207,8 @@ class AppCommand {
                 var srcPath = path.join(appPath, file);
                 var str = me.read(srcPath);
                 str = str.replace(new RegExp(config["url"]["src"]), config["url"]["des"].replace("${url}", url));
-                fs_extra.outputFileSync(srcPath, str);
+                console.log('REPLACE outputfile5', srcPath);
+                fs.writeFileSync(srcPath, str);
             });
         }
     }
@@ -170,7 +219,8 @@ class AppCommand {
                 var destPath = path.join(appPath, file);
                 var str = me.read(destPath);
                 str = str.replace(new RegExp(config["package"]["name"], "g"), package_name);
-                fs_extra.outputFileSync(destPath, str);
+                console.log('REPLACE outfile6', destPath);
+                fs.writeFileSync(destPath, str);
             });
         }
     }
@@ -193,7 +243,8 @@ class AppCommand {
             outpath = path.join(config["res"]["path"], outpath);
             outpath = path.join(appPath, outpath);
             if (!fs.existsSync(outpath)) {
-                fs_extra.mkdirsSync(outpath);
+                console.log('REPLACE mkdir7', outpath);
+                mkdirsSync(outpath);
             }
             console.log('正在执行LayaDcc...');
             gen_dcc.gendcc(res_path, outpath, true, false);
@@ -224,7 +275,8 @@ class AppCommand {
                 }
             }
         }
-        fs_extra.outputFileSync(file, doc.toString());
+        console.log('REPLACE  outputfile8', file);
+        fs.writeFileSync(file, doc.toString());
     }
     processName(config, name, appPath) {
         var me = this;
@@ -232,7 +284,8 @@ class AppCommand {
             var srcPath = path.join(appPath, file);
             var str = me.read(srcPath);
             str = str.replace(new RegExp(config["template"]["name"], "g"), name);
-            fs_extra.outputFileSync(srcPath, str);
+            console.log('REPLACE outputfile9 ' + srcPath);
+            fs.writeFileSync(srcPath, str);
         });
         config["template"]["rename"].forEach(function (file) {
             var oldPath = path.join(appPath, file);
@@ -261,7 +314,8 @@ class AppCommand {
         return fs.existsSync(path.join(folder, exports.H5_PROJECT_CONFIG_FILE));
     }
     static getH5BinFolder(folder) {
-        let config = fs_extra.readJSONSync(path.join(folder, exports.H5_PROJECT_CONFIG_FILE));
+        console.log('REPLACE readjson10');
+        let config = JSON.parse(fs.readFileSync(path.join(folder, exports.H5_PROJECT_CONFIG_FILE), 'utf8'));
         return path.join(folder, config.res);
     }
     static getResFolder(folder) {
@@ -280,8 +334,9 @@ class AppCommand {
             var appdata = process.env.AppData || process.env.USERPROFILE + "/AppData/Roaming/";
             dataPath = appdata + "/Laya/layanative/template/";
         }
-        if (!fs_extra.existsSync(dataPath)) {
-            fs_extra.mkdirsSync(dataPath);
+        if (!fs.existsSync(dataPath)) {
+            console.log('REPLACE: mkdir11 ' + dataPath);
+            mkdirsSync(dataPath);
         }
         return dataPath;
     }

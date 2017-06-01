@@ -2,7 +2,6 @@
 import * as AppCommand from './appCommand';
 import * as fs from 'fs';
 import * as path from 'path';
-import fs_extra = require('fs-extra');
 import * as request from 'request';
 
 export var command = 'createapp'

@@ -2,7 +2,6 @@
 const AppCommand = require("./appCommand");
 const fs = require("fs");
 const path = require("path");
-const fs_extra = require("fs-extra");
 exports.command = 'removeres';
 exports.describe = '删除app缓存资源';
 exports.builder = {
@@ -28,7 +27,7 @@ exports.handler = function (argv) {
             console.log('错误: 找不到文件 ' + nativeJSONPath);
             return;
         }
-        let nativeJSON = fs_extra.readJSONSync(nativeJSONPath);
+        let nativeJSON = JSON.parse(fs.readFileSync(nativeJSONPath, 'utf8'));
         if (!nativeJSON || !nativeJSON.h5) {
             console.log('错误: 文件 ' + nativeJSONPath + ' 无效');
         }
