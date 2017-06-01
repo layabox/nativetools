@@ -16,7 +16,7 @@ module.exports = {
             package_name: package_name,
             path: path
         };
-        createAppCommand_1.handler(args);
+        return createAppCommand_1.handler(args);
     },
     refreshres: (platform, path, url) => {
         var args = {

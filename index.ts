@@ -18,7 +18,7 @@ module.exports = {
             package_name: package_name,
             path: path
         };
-        handler(args);
+        return handler(args);
     },
     refreshres: (platform: string, path: string, url: string) => {
         var args = {
