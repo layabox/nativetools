@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/layabox/nativetools#readme",
   "dependencies": {
-    "fs-extra": "^3.0.1",
     "layadcc": "^1.7.1",
     "progress": "^2.0.0",
     "request": "^2.81.0",
