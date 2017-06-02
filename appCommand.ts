@@ -233,7 +233,7 @@ export class AppCommand {
         fs.writeFileSync( newConfigPath, JSON.stringify(config));
 
         let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
-        let nativeJSON = { h5: path.relative(path.dirname(nativeJSONPath), folder) };
+        let nativeJSON = { h5: nativeJSONPath};
         console.log('REPLACE writeJSON4', nativeJSONPath);
         p1 = path.dirname(nativeJSONPath);
         mkdirsSync(p1);

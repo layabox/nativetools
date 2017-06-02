@@ -55,7 +55,7 @@ exports.handler = function (argv) {
       console.log('错误: 文件 ' + nativeJSONPath + ' 无效');
     }
 
-    let folder = path.join(path.dirname(nativeJSONPath), nativeJSON.h5);
+    let folder = nativeJSON.h5;
 
     if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
 

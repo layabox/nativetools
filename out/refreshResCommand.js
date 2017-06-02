@@ -1,7 +1,7 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const AppCommand = require("./appCommand");
 const fs = require("fs");
-const path = require("path");
 exports.command = 'refreshres';
 exports.describe = '刷新app项目资源';
 exports.builder = {
@@ -45,7 +45,7 @@ exports.handler = function (argv) {
         if (!nativeJSON || !nativeJSON.h5) {
             console.log('错误: 文件 ' + nativeJSONPath + ' 无效');
         }
-        let folder = path.join(path.dirname(nativeJSONPath), nativeJSON.h5);
+        let folder = nativeJSON.h5;
         if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
             let appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_IOS);
             cmd.excuteRefreshRes(folder, argv.url, appPath);
