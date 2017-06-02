@@ -66,6 +66,32 @@ function copyFolderRecursiveSync(source, target) {
         });
     }
 }
+function rmdirSync(dir) {
+    function iterator(url, dirs) {
+        var stat = fs.statSync(url);
+        if (stat.isDirectory()) {
+            dirs.unshift(url);
+            inner(url, dirs);
+        }
+        else if (stat.isFile()) {
+            fs.unlinkSync(url);
+        }
+    }
+    function inner(path, dirs) {
+        var arr = fs.readdirSync(path);
+        for (var i = 0, el; el = arr[i++];) {
+            iterator(path + "/" + el, dirs);
+        }
+    }
+    var dirs = [];
+    try {
+        iterator(dir, dirs);
+        dirs.forEach((v) => { fs.rmdirSync(v); });
+    }
+    catch (e) {
+    }
+}
+;
 class AppCommand {
     constructor() {
     }
@@ -84,7 +110,6 @@ class AppCommand {
             console.log('错误: 找不到文件 ' + configPath);
             return false;
         }
-        console.log('REPLACE readjson1 ' + configPath);
         let config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         if (!config) {
             console.log('错误: 读取文件 ' + configPath + ' 失败');
@@ -119,7 +144,7 @@ class AppCommand {
             }
         }
         console.log("REPLACE rmdir1 " + path.join(appPath, config["res"]["path"]));
-        fs.rmdirSync(path.join(appPath, config["res"]["path"]));
+        rmdirSync(path.join(appPath, config["res"]["path"]));
         this.processDcc(config, folder, url, appPath);
         return true;
     }
@@ -142,7 +167,7 @@ class AppCommand {
         let dir = path.join(appPath, config["res"]["path"]);
         console.log('正在删除 ' + dir + ' ...');
         console.log('REPLACE emptydir1 ' + dir);
-        fs.rmdirSync(dir);
+        rmdirSync(dir);
         mkdirsSync(dir);
         return true;
     }
@@ -183,10 +208,14 @@ class AppCommand {
         let newConfigPath = path.join(appPath, "config.json");
         config["res"]["path"] = config["res"]["path"].replace(config["template"]["name"], name);
         console.log('REPLACE  writejson3 ', newConfigPath);
+        var p1 = path.dirname(newConfigPath);
+        mkdirsSync(p1);
         fs.writeFileSync(newConfigPath, JSON.stringify(config));
         let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
         let nativeJSON = { h5: path.relative(path.dirname(nativeJSONPath), folder) };
         console.log('REPLACE writeJSON4', nativeJSONPath);
+        p1 = path.dirname(nativeJSONPath);
+        mkdirsSync(p1);
         fs.writeFileSync(nativeJSONPath, JSON.stringify(nativeJSON));
         return true;
     }
@@ -198,6 +227,8 @@ class AppCommand {
                     var p = path.join(appPath, v);
                     var s = me.read(p);
                     s = s.replace(new RegExp(config.localize.src, 'g'), config.localize.des);
+                    var p1 = path.dirname(p);
+                    mkdirsSync(p1);
                     fs.writeFileSync(p, s);
                 });
             }
@@ -208,6 +239,8 @@ class AppCommand {
                 var str = me.read(srcPath);
                 str = str.replace(new RegExp(config["url"]["src"]), config["url"]["des"].replace("${url}", url));
                 console.log('REPLACE outputfile5', srcPath);
+                var p = path.dirname(srcPath);
+                mkdirsSync(p);
                 fs.writeFileSync(srcPath, str);
             });
         }
@@ -220,6 +253,8 @@ class AppCommand {
                 var str = me.read(destPath);
                 str = str.replace(new RegExp(config["package"]["name"], "g"), package_name);
                 console.log('REPLACE outfile6', destPath);
+                var p = path.dirname(destPath);
+                mkdirsSync(p);
                 fs.writeFileSync(destPath, str);
             });
         }
@@ -243,7 +278,6 @@ class AppCommand {
             outpath = path.join(config["res"]["path"], outpath);
             outpath = path.join(appPath, outpath);
             if (!fs.existsSync(outpath)) {
-                console.log('REPLACE mkdir7', outpath);
                 mkdirsSync(outpath);
             }
             console.log('正在执行LayaDcc...');
@@ -276,6 +310,8 @@ class AppCommand {
             }
         }
         console.log('REPLACE  outputfile8', file);
+        var p1 = path.dirname(file);
+        mkdirsSync(p1);
         fs.writeFileSync(file, doc.toString());
     }
     processName(config, name, appPath) {
@@ -285,6 +321,8 @@ class AppCommand {
             var str = me.read(srcPath);
             str = str.replace(new RegExp(config["template"]["name"], "g"), name);
             console.log('REPLACE outputfile9 ' + srcPath);
+            var p = path.dirname(srcPath);
+            mkdirsSync(p);
             fs.writeFileSync(srcPath, str);
         });
         config["template"]["rename"].forEach(function (file) {
