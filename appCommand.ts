@@ -233,7 +233,7 @@ export class AppCommand {
         fs.writeFileSync( newConfigPath, JSON.stringify(config));
 
         let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
-        let nativeJSON = { h5: nativeJSONPath};
+        let nativeJSON = { h5: folder};
         console.log('REPLACE writeJSON4', nativeJSONPath);
         p1 = path.dirname(nativeJSONPath);
         mkdirsSync(p1);
@@ -314,6 +314,7 @@ export class AppCommand {
             }
             console.log('正在执行LayaDcc...');
             gen_dcc.gendcc(res_path, outpath, true, false);
+
         }
     }
     private processDisplayName(config: any, platform: string, app_name: string, appPath: string) {

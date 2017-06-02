@@ -213,7 +213,7 @@ class AppCommand {
         mkdirsSync(p1);
         fs.writeFileSync(newConfigPath, JSON.stringify(config));
         let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
-        let nativeJSON = { h5: nativeJSONPath };
+        let nativeJSON = { h5: folder };
         console.log('REPLACE writeJSON4', nativeJSONPath);
         p1 = path.dirname(nativeJSONPath);
         mkdirsSync(p1);

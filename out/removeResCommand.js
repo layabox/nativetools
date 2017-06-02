@@ -31,7 +31,6 @@ exports.handler = function (argv) {
         if (!nativeJSON || !nativeJSON.h5) {
             console.log('错误: 文件 ' + nativeJSONPath + ' 无效');
         }
-        let folder = nativeJSON.h5;
         let appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_IOS);
         if (fs.existsSync(appPath)) {
             cmd.excuteRemoveRes(appPath);
