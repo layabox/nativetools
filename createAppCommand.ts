@@ -21,13 +21,6 @@ export var builder = {
     requiresArg: true,
     description: 'native项目输出路径'
   },
-  sdk:
-  {
-    alias: 's',
-    required: false,
-    requiresArg: true,
-    description: 'SDK本地目录 说明：自定义的SDK目录'
-  },
   version:
   {
     alias: 'v',
@@ -82,6 +75,13 @@ export var builder = {
     required: false,
     requiresArg: true,
     description: '包名'
+  },
+  sdk:
+  {
+    alias: 's',
+    required: false,
+    requiresArg: true,
+    description: 'SDK本地目录 说明：自定义的SDK目录，可选参数。一般情况下建议使用参数—version。'
   }
 }
 
