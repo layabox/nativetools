@@ -19,8 +19,6 @@ exports.handler = function (argv) {
         let nativePath = null;
         nativePath = AppCommand.AppCommand.getNativePath(argv.path);
         nativeJSONPath = AppCommand.AppCommand.getNativeJSONPath(argv.path);
-        console.log(nativePath);
-        console.log(nativeJSONPath);
         if (!fs.existsSync(nativePath)) {
             console.log('错误: 找不到目录 ' + nativePath);
             return;
