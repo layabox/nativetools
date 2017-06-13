@@ -392,7 +392,8 @@ export class AppCommand {
         return path.join(process.cwd(), dir);
     }
     static isH5Folder(folder: string): boolean {
-        return fs.existsSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
+        //return fs.existsSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
+        return false;
     }
     static getH5BinFolder(folder: string): string {
         console.log('REPLACE readjson10'); 

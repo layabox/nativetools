@@ -350,7 +350,7 @@ class AppCommand {
         return path.join(process.cwd(), dir);
     }
     static isH5Folder(folder) {
-        return fs.existsSync(path.join(folder, exports.H5_PROJECT_CONFIG_FILE));
+        return false;
     }
     static getH5BinFolder(folder) {
         console.log('REPLACE readjson10');
