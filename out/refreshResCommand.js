@@ -38,12 +38,17 @@ exports.handler = function (argv) {
             return;
         }
         if (!fs.existsSync(nativeJSONPath)) {
-            console.log('错误: 找不到文件 ' + nativeJSONPath);
+            console.log('错误: 找不到文件 ' + nativeJSONPath + "，无效的native项目路径");
             return;
         }
         let nativeJSON = JSON.parse(fs.readFileSync(nativeJSONPath, 'utf8'));
-        if (!nativeJSON || !nativeJSON.h5) {
+        if (!nativeJSON) {
             console.log('错误: 文件 ' + nativeJSONPath + ' 无效');
+            return;
+        }
+        if (nativeJSON.h5 === '') {
+            console.log('错误: 资源目录为空，刷新失败');
+            return;
         }
         let folder = nativeJSON.h5;
         if (argv.platform === AppCommand.PLATFORM_ANDROID_ALL) {
