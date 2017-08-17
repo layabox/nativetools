@@ -232,14 +232,13 @@ export class AppCommand {
         mkdirsSync(p1);
         fs.writeFileSync( newConfigPath, JSON.stringify(config));
 
-        if (type > 0) {
-            let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
-            let nativeJSON = { h5: folder};
-            console.log('REPLACE writeJSON4', nativeJSONPath);
-            p1 = path.dirname(nativeJSONPath);
-            mkdirsSync(p1);
-            fs.writeFileSync( nativeJSONPath, JSON.stringify(nativeJSON));
-        }
+        let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
+        let nativeJSON = { h5: folder ? folder : ''};
+        console.log('REPLACE writeJSON4', nativeJSONPath);
+        p1 = path.dirname(nativeJSONPath);
+        mkdirsSync(p1);
+        fs.writeFileSync( nativeJSONPath, JSON.stringify(nativeJSON));
+
         return true;
     }
     private processUrl(config: any, type: number, url: string, appPath: string) {

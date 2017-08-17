@@ -24,12 +24,8 @@ exports.handler = function (argv) {
             return;
         }
         if (!fs.existsSync(nativeJSONPath)) {
-            console.log('错误: 找不到文件 ' + nativeJSONPath);
+            console.log('错误: 找不到文件 ' + nativeJSONPath + "，无效的native项目路径");
             return;
-        }
-        let nativeJSON = JSON.parse(fs.readFileSync(nativeJSONPath, 'utf8'));
-        if (!nativeJSON || !nativeJSON.h5) {
-            console.log('错误: 文件 ' + nativeJSONPath + ' 无效');
         }
         let appPath = AppCommand.AppCommand.getAppPath(nativePath, AppCommand.PLATFORM_IOS);
         if (fs.existsSync(appPath)) {
