@@ -173,7 +173,7 @@ class AppCommand {
         return true;
     }
     excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, outputPath) {
-        if (!fs.existsSync(folder)) {
+        if (type > 0 && !fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
             return false;
         }
@@ -201,7 +201,7 @@ class AppCommand {
         }
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
-        if (type === 1 || type === 2) {
+        if (type > 0) {
             this.processDcc(config, folder, url, appPath);
         }
         this.processDisplayName(config, platform, app_name, appPath);
@@ -212,12 +212,14 @@ class AppCommand {
         var p1 = path.dirname(newConfigPath);
         mkdirsSync(p1);
         fs.writeFileSync(newConfigPath, JSON.stringify(config));
-        let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
-        let nativeJSON = { h5: folder };
-        console.log('REPLACE writeJSON4', nativeJSONPath);
-        p1 = path.dirname(nativeJSONPath);
-        mkdirsSync(p1);
-        fs.writeFileSync(nativeJSONPath, JSON.stringify(nativeJSON));
+        if (type > 0) {
+            let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
+            let nativeJSON = { h5: folder };
+            console.log('REPLACE writeJSON4', nativeJSONPath);
+            p1 = path.dirname(nativeJSONPath);
+            mkdirsSync(p1);
+            fs.writeFileSync(nativeJSONPath, JSON.stringify(nativeJSON));
+        }
         return true;
     }
     processUrl(config, type, url, appPath) {
@@ -261,7 +263,7 @@ class AppCommand {
         }
     }
     processDcc(config, folder, url, appPath) {
-        let res_path = AppCommand.getResFolder(folder);
+        let res_path = folder;
         if (res_path && res_path != "" && fs.existsSync(res_path)) {
             var outpath = url;
             var index = outpath.indexOf('?');
@@ -348,20 +350,6 @@ class AppCommand {
         if (path.isAbsolute(dir))
             return dir;
         return path.join(process.cwd(), dir);
-    }
-    static isH5Folder(folder) {
-        return false;
-    }
-    static getH5BinFolder(folder) {
-        console.log('REPLACE readjson10');
-        let config = JSON.parse(fs.readFileSync(path.join(folder, exports.H5_PROJECT_CONFIG_FILE), 'utf8'));
-        return path.join(folder, config.res);
-    }
-    static getResFolder(folder) {
-        if (AppCommand.isH5Folder(folder)) {
-            return AppCommand.getH5BinFolder(folder);
-        }
-        return folder;
     }
     static getAppDataPath() {
         let dataPath;

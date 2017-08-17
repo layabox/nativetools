@@ -183,7 +183,7 @@ export class AppCommand {
     }
     public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, outputPath: string): boolean {
 
-        if (!fs.existsSync(folder)) {
+        if (type > 0 && !fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
             return false;
         }
@@ -219,7 +219,7 @@ export class AppCommand {
 
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
-        if (type === 1 || type === 2) {
+        if (type > 0) {
             this.processDcc(config, folder, url, appPath);
         }
         this.processDisplayName(config, platform, app_name, appPath);
@@ -232,13 +232,14 @@ export class AppCommand {
         mkdirsSync(p1);
         fs.writeFileSync( newConfigPath, JSON.stringify(config));
 
-        let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
-        let nativeJSON = { h5: folder};
-        console.log('REPLACE writeJSON4', nativeJSONPath);
-        p1 = path.dirname(nativeJSONPath);
-        mkdirsSync(p1);
-        fs.writeFileSync( nativeJSONPath, JSON.stringify(nativeJSON));
-
+        if (type > 0) {
+            let nativeJSONPath = AppCommand.getNativeJSONPath(path.join(outputPath, name));
+            let nativeJSON = { h5: folder};
+            console.log('REPLACE writeJSON4', nativeJSONPath);
+            p1 = path.dirname(nativeJSONPath);
+            mkdirsSync(p1);
+            fs.writeFileSync( nativeJSONPath, JSON.stringify(nativeJSON));
+        }
         return true;
     }
     private processUrl(config: any, type: number, url: string, appPath: string) {
@@ -286,7 +287,7 @@ export class AppCommand {
         }
     }
     private processDcc(config: any, folder: string, url: string, appPath: string) {
-        let res_path = AppCommand.getResFolder(folder);//获取资源目录
+        let res_path = folder;//获取资源目录
         //资源打包路径
         if (res_path && res_path != "" && fs.existsSync(res_path)) {
             var outpath = url;
@@ -390,22 +391,6 @@ export class AppCommand {
         if (path.isAbsolute(dir))
             return dir;
         return path.join(process.cwd(), dir);
-    }
-    static isH5Folder(folder: string): boolean {
-        //return fs.existsSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
-        return false;
-    }
-    static getH5BinFolder(folder: string): string {
-        console.log('REPLACE readjson10'); 
-        //let config = fs_extra.readJSONSync(path.join(folder, H5_PROJECT_CONFIG_FILE));
-        let config = JSON.parse(fs.readFileSync(path.join(folder, H5_PROJECT_CONFIG_FILE),'utf8'));
-        return path.join(folder, config.res);
-    }
-    static getResFolder(folder: string): string {
-        if (AppCommand.isH5Folder(folder)) {
-            return AppCommand.getH5BinFolder(folder);
-        }
-        return folder;//不是H5项目目录，直接认为是bin目录
     }
     static getAppDataPath(): string {
         let dataPath;
