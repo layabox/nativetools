@@ -47,6 +47,7 @@ exports.handler = function (argv) {
         if (fs.existsSync(appPath)) {
             cmd.excuteRemoveRes(appPath);
         }
+        console.log('请继续......');
     }
     catch (error) {
         if (error.code === 'EPERM') {

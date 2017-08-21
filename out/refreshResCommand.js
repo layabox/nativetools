@@ -68,6 +68,7 @@ exports.handler = function (argv) {
                 console.log('错误：找不到目录' + appPath);
             }
         }
+        console.log('请继续......');
     }
     catch (error) {
         console.log();

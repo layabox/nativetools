@@ -13,6 +13,7 @@ exports.handler = async function (argv) {
     for (let i = 0; i < sdkVersionConfig.versionList.length; i++) {
       console.log(' ' + sdkVersionConfig.versionList[i].version);
     }
+    console.log('请继续......');
   }
   catch (error) {
     console.log();

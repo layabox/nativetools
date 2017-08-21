@@ -167,6 +167,7 @@ exports.handler = function (argv) {
             else {
                 cmd.excuteCreateApp(folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
             }
+            console.log('请继续......');
         }
         catch (error) {
             console.log();
