@@ -13,12 +13,14 @@ export const DEFAULT_APP_NAME: string = 'LayaBox';
 export const DEFAULT_PACKAGE_NAME: string = 'com.layabox.game';
 export const DEFAULT_TYPE: number = 0;
 export const NATIVE_JSON_FILE_NAME: string = 'native.json';
-export const PLATFORM_ANDROID_ALL: string = 'all';
+export const PLATFORM_ALL: string = 'all';
 export const PLATFORM_IOS: string = 'ios';
 export const PLATFORM_ANDROID_ECLIPSE: string = 'android_eclipse';
 export const PLATFORM_ANDROID_STUDIO: string = 'android_studio';
 export const H5_PROJECT_CONFIG_FILE: string = 'config.json';
-
+export const DEMENSION_2D: string = '2D';
+export const DEMENSION_3D: string = '3D';
+export const WKWEBVIEW: string = 'WKWebview';
 function mkdirsSync(dirname:string, mode?:number):boolean{
     if (fs.existsSync(dirname)){
         return true;
@@ -181,7 +183,7 @@ export class AppCommand {
 
         return true;
     }
-    public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, outputPath: string): boolean {
+    public excuteCreateApp(demension:string, folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, outputPath: string): boolean {
 
         if (type > 0 && !fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
@@ -189,9 +191,13 @@ export class AppCommand {
         }
 
         var me = this;
-        let appPath = AppCommand.getAppPath(AppCommand.getNativePath(path.join(outputPath, name)), platform);
 
-        let configPath = path.isAbsolute(sdk) ? path.join(path.join(sdk, platform), "config.json") : path.join(path.join(process.cwd(), sdk, platform), "config.json");
+        let isIOS3D = (platform === PLATFORM_IOS && demension === '3D');
+
+        let appPath = AppCommand.getAppPath(AppCommand.getNativePath(path.join(outputPath, name)), isIOS3D ? WKWEBVIEW : platform);
+        let absCfgPath = path.join(path.join(sdk, isIOS3D ? WKWEBVIEW : platform), "config.json");
+        let relCfgPath = path.join(path.join(process.cwd(), sdk, isIOS3D ? WKWEBVIEW : platform), "config.json");
+        let configPath = path.isAbsolute(sdk) ?  absCfgPath : relCfgPath;
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath + '。不是有效的SDK目录');
             return false;
@@ -208,9 +214,9 @@ export class AppCommand {
             console.log("错误： 项目 " + appPath + " 已经存在");
             return false;
         }
-
-        console.log('REPLACE copydir1 ',path.join(sdk, platform), path.dirname(appPath));
-        copyFolderRecursiveSync(path.join(sdk, platform), path.dirname(appPath));
+        let srcPath = path.join(sdk, isIOS3D ? WKWEBVIEW : platform);
+        console.log('REPLACE copydir1 ', srcPath, path.dirname(appPath));
+        copyFolderRecursiveSync(srcPath, path.dirname(appPath));
         //fs_extra.copySync(path.join(sdk, platform), appPath);
 
         if (type === 2) {
