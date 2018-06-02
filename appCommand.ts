@@ -21,6 +21,7 @@ export const H5_PROJECT_CONFIG_FILE: string = 'config.json';
 export const DEMENSION_2D: string = '2D';
 export const DEMENSION_3D: string = '3D';
 export const WKWEBVIEW: string = 'WKWebview';
+export const WEBGLRENDERMODEJS: string = 'window.ConchRenderType=6;';
 function mkdirsSync(dirname:string, mode?:number):boolean{
     if (fs.existsSync(dirname)){
         return true;
@@ -214,6 +215,17 @@ export class AppCommand {
             console.log("错误： 项目 " + appPath + " 已经存在");
             return false;
         }
+        if (demension === '3D') {
+            if (!config.version) {
+                console.log("错误：此SDK版本不支持3D");
+                return false;
+            }
+        }
+
+        if (config.version) {
+            console.log("SDK version " + config.version);
+        }
+        
         let srcPath = path.join(sdk, isIOS3D ? WKWEBVIEW : platform);
         console.log('REPLACE copydir1 ', srcPath, path.dirname(appPath));
         copyFolderRecursiveSync(srcPath, path.dirname(appPath));
@@ -223,6 +235,15 @@ export class AppCommand {
             url = STAND_ALONE_URL;
         }
 
+        if (demension === '3D') {
+            if (config.renderType) {
+                var configJsPath = path.join(appPath, config.renderType);
+                var str = this.read(configJsPath);
+                str += "\n";
+                str += WEBGLRENDERMODEJS;
+                fs.writeFileSync(configJsPath,str);
+            }
+        }
         this.processUrl(config, type, url, appPath);
         this.processPackageName(config, package_name, appPath);
         if (type > 0) {
