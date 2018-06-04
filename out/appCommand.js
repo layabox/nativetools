@@ -24,12 +24,12 @@ exports.DEFAULT_TYPE = 0;
 exports.NATIVE_JSON_FILE_NAME = 'native.json';
 exports.PLATFORM_ALL = 'all';
 exports.PLATFORM_IOS = 'ios';
+exports.PLATFORM_IOS_WKWEBVIEW = 'WKWebview';
 exports.PLATFORM_ANDROID_ECLIPSE = 'android_eclipse';
 exports.PLATFORM_ANDROID_STUDIO = 'android_studio';
 exports.H5_PROJECT_CONFIG_FILE = 'config.json';
 exports.DEMENSION_2D = '2D';
 exports.DEMENSION_3D = '3D';
-exports.WKWEBVIEW = 'WKWebview';
 exports.WEBGLRENDERMODEJS = 'window.ConchRenderType=6;';
 function mkdirsSync(dirname, mode) {
     if (fs.existsSync(dirname)) {
@@ -182,10 +182,9 @@ class AppCommand {
             return false;
         }
         var me = this;
-        let isIOS3D = (platform === exports.PLATFORM_IOS && demension === '3D');
-        let appPath = AppCommand.getAppPath(AppCommand.getNativePath(path.join(outputPath, name)), isIOS3D ? exports.WKWEBVIEW : platform);
-        let absCfgPath = path.join(path.join(sdk, isIOS3D ? exports.WKWEBVIEW : platform), "config.json");
-        let relCfgPath = path.join(path.join(process.cwd(), sdk, isIOS3D ? exports.WKWEBVIEW : platform), "config.json");
+        let appPath = AppCommand.getAppPath(AppCommand.getNativePath(path.join(outputPath, name)), platform);
+        let absCfgPath = path.join(path.join(sdk, platform), "config.json");
+        let relCfgPath = path.join(path.join(process.cwd(), sdk, platform), "config.json");
         let configPath = path.isAbsolute(sdk) ? absCfgPath : relCfgPath;
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath + '。不是有效的SDK目录');
@@ -210,7 +209,7 @@ class AppCommand {
         if (config.version) {
             console.log("SDK version " + config.version);
         }
-        let srcPath = path.join(sdk, isIOS3D ? exports.WKWEBVIEW : platform);
+        let srcPath = path.join(sdk, platform);
         console.log('REPLACE copydir1 ', srcPath, path.dirname(appPath));
         copyFolderRecursiveSync(srcPath, path.dirname(appPath));
         if (type === 2) {
@@ -315,7 +314,7 @@ class AppCommand {
         let file = path.join(appPath, config["template"]["display"]);
         let xml = this.read(file);
         let doc = new xmldom.DOMParser().parseFromString(xml);
-        if (platform === exports.PLATFORM_IOS) {
+        if (platform === exports.PLATFORM_IOS || platform === exports.PLATFORM_IOS_WKWEBVIEW) {
             let dictNode = doc.getElementsByTagName('dict')[0];
             let keyNode = doc.createElement("key");
             let keyTextNode = doc.createTextNode("CFBundleDisplayName");

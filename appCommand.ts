@@ -15,12 +15,12 @@ export const DEFAULT_TYPE: number = 0;
 export const NATIVE_JSON_FILE_NAME: string = 'native.json';
 export const PLATFORM_ALL: string = 'all';
 export const PLATFORM_IOS: string = 'ios';
+export const PLATFORM_IOS_WKWEBVIEW: string = 'WKWebview';
 export const PLATFORM_ANDROID_ECLIPSE: string = 'android_eclipse';
 export const PLATFORM_ANDROID_STUDIO: string = 'android_studio';
 export const H5_PROJECT_CONFIG_FILE: string = 'config.json';
 export const DEMENSION_2D: string = '2D';
 export const DEMENSION_3D: string = '3D';
-export const WKWEBVIEW: string = 'WKWebview';
 export const WEBGLRENDERMODEJS: string = 'window.ConchRenderType=6;';
 function mkdirsSync(dirname:string, mode?:number):boolean{
     if (fs.existsSync(dirname)){
@@ -193,11 +193,9 @@ export class AppCommand {
 
         var me = this;
 
-        let isIOS3D = (platform === PLATFORM_IOS && demension === '3D');
-
-        let appPath = AppCommand.getAppPath(AppCommand.getNativePath(path.join(outputPath, name)), isIOS3D ? WKWEBVIEW : platform);
-        let absCfgPath = path.join(path.join(sdk, isIOS3D ? WKWEBVIEW : platform), "config.json");
-        let relCfgPath = path.join(path.join(process.cwd(), sdk, isIOS3D ? WKWEBVIEW : platform), "config.json");
+        let appPath = AppCommand.getAppPath(AppCommand.getNativePath(path.join(outputPath, name)), platform);
+        let absCfgPath = path.join(path.join(sdk, platform), "config.json");
+        let relCfgPath = path.join(path.join(process.cwd(), sdk, platform), "config.json");
         let configPath = path.isAbsolute(sdk) ?  absCfgPath : relCfgPath;
         if (!fs.existsSync(configPath)) {
             console.log('错误: 找不到文件 ' + configPath + '。不是有效的SDK目录');
@@ -226,7 +224,7 @@ export class AppCommand {
             console.log("SDK version " + config.version);
         }
         
-        let srcPath = path.join(sdk, isIOS3D ? WKWEBVIEW : platform);
+        let srcPath = path.join(sdk, platform);
         console.log('REPLACE copydir1 ', srcPath, path.dirname(appPath));
         copyFolderRecursiveSync(srcPath, path.dirname(appPath));
         //fs_extra.copySync(path.join(sdk, platform), appPath);
@@ -349,7 +347,7 @@ export class AppCommand {
         let xml = this.read(file);
         let doc = new xmldom.DOMParser().parseFromString(xml);
 
-        if (platform === PLATFORM_IOS) {
+        if (platform === PLATFORM_IOS || platform === PLATFORM_IOS_WKWEBVIEW) {
 
             let dictNode = doc.getElementsByTagName('dict')[0];
             let keyNode = doc.createElement("key");
