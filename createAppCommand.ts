@@ -14,7 +14,7 @@ export var builder = {
     choices: [AppCommand.DEMENSION_2D, AppCommand.DEMENSION_3D],
     required: false,
     requiresArg: true,
-    description: '项目平台类型2D还是3D'
+    description: '项目类型2D还是3D'
   },
   folder:
   {
