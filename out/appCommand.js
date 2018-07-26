@@ -202,7 +202,7 @@ class AppCommand {
         }
         if (demension === '3D') {
             if (!config.version) {
-                console.log("错误：支持3D需要版本至少为0.9.16");
+                console.log("错误：支持3D需要版本至少为1.0");
                 return false;
             }
         }
