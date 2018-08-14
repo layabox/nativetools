@@ -4,8 +4,9 @@ const createAppCommand_1 = require("./createAppCommand");
 const AppCommand = require("./appCommand");
 const path = require("path");
 module.exports = {
-    createapp: (folder, sdk, version, platform, type, url, name, app_name, package_name, path) => {
+    createapp: (demension, folder, sdk, version, platform, type, url, name, app_name, package_name, path) => {
         var args = {
+			demension: demension,
             folder: folder,
             sdk: sdk,
             version: version,
