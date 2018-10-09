@@ -5,8 +5,9 @@ import * as path from 'path';
 import * as request from 'request';
 
 module.exports = {
-    createapp: (folder: string, sdk: string, version: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, path: string) => {
+    createapp: (demension: string, folder: string, sdk: string, version: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, path: string) => {
         var args = {
+            demension: demension,
             folder: folder,
             sdk: sdk,
             version: version,

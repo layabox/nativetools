@@ -7,7 +7,7 @@ import * as xmldom from 'xmldom';
 import * as ProgressBar from 'progress';
 
 export const STAND_ALONE_URL: string = 'http://stand.alone.version/index.html';
-export const VERSION_CONFIG_URL: string = 'http://layabox.com/layaplayer/layanativeRes/versionconfig.json';
+export const VERSION_CONFIG_URL: string = 'https://layabox.com/layaplayer/layanativeRes/versionconfig.json';
 export const DEFAULT_NAME: string = 'LayaBox';
 export const DEFAULT_APP_NAME: string = 'LayaBox';
 export const DEFAULT_PACKAGE_NAME: string = 'com.layabox.game';

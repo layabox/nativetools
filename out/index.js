@@ -6,7 +6,7 @@ const path = require("path");
 module.exports = {
     createapp: (demension, folder, sdk, version, platform, type, url, name, app_name, package_name, path) => {
         var args = {
-			demension: demension,
+            demension: demension,
             folder: folder,
             sdk: sdk,
             version: version,
