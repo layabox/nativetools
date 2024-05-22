@@ -1,13 +1,15 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = exports.builder = exports.describe = exports.command = void 0;
 const AppCommand = require("./appCommand");
 const path = require("path");
 exports.command = 'createapp';
@@ -88,7 +90,7 @@ exports.builder = {
         description: 'SDK本地目录：自定义的SDK目录，可选参数。一般情况下建议使用参数—version。'
     }
 };
-exports.handler = function (argv) {
+var handler = function (argv) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let cmd = new AppCommand.AppCommand();
@@ -172,6 +174,7 @@ exports.handler = function (argv) {
                 cmd.excuteCreateApp(argv.demension, folder, sdk, AppCommand.PLATFORM_IOS_WKWEBVIEW, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
                 cmd.excuteCreateApp(argv.demension, folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
                 cmd.excuteCreateApp(argv.demension, folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
+                cmd.excuteCreateApp(argv.demension, folder, sdk, AppCommand.PLATFORM_OHOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
             }
             else {
                 cmd.excuteCreateApp(argv.demension, folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
@@ -188,3 +191,4 @@ exports.handler = function (argv) {
         }
     });
 };
+exports.handler = handler;

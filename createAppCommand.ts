@@ -184,6 +184,7 @@ export var handler = async function (argv) {
       cmd.excuteCreateApp(argv.demension, folder, sdk, AppCommand.PLATFORM_IOS_WKWEBVIEW, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
       cmd.excuteCreateApp(argv.demension, folder, sdk, AppCommand.PLATFORM_ANDROID_ECLIPSE, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
       cmd.excuteCreateApp(argv.demension, folder, sdk, AppCommand.PLATFORM_ANDROID_STUDIO, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
+      cmd.excuteCreateApp(argv.demension, folder, sdk, AppCommand.PLATFORM_OHOS, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);
     }
     else {
       cmd.excuteCreateApp(argv.demension, folder, sdk, argv.platform, argv.type, argv.url, argv.name, argv.app_name, argv.package_name, argv.path);

@@ -5,6 +5,7 @@ import * as request from 'request';
 import child_process = require('child_process');
 import * as xmldom from 'xmldom';
 import * as ProgressBar from 'progress';
+import { BaseTools, OhosTools } from './Ohos';
 
 export const STAND_ALONE_URL: string = 'http://stand.alone.version/index.html';
 export const VERSION_CONFIG_URL: string = 'https://layabox.com/layaplayer/layanativeRes/versionconfig.json';
@@ -18,10 +19,12 @@ export const PLATFORM_IOS: string = 'ios';
 export const PLATFORM_IOS_WKWEBVIEW: string = 'wkwebview';
 export const PLATFORM_ANDROID_ECLIPSE: string = 'android_eclipse';
 export const PLATFORM_ANDROID_STUDIO: string = 'android_studio';
+export const PLATFORM_OHOS: string = 'ohos';
 export const H5_PROJECT_CONFIG_FILE: string = 'config.json';
 export const DEMENSION_2D: string = '2D';
 export const DEMENSION_3D: string = '3D';
 export const WEBGLRENDERMODEJS: string = 'window.ConchRenderType=6;';
+
 function mkdirsSync(dirname:string, mode?:number):boolean{
     if (fs.existsSync(dirname)){
         return true;
@@ -95,8 +98,9 @@ function rmdirSync(dir:string){
 };
 
 export class AppCommand {
-
+    tools:Map<string,BaseTools> = new Map<string,BaseTools>();
     constructor() {
+        this.tools.set(PLATFORM_OHOS, new OhosTools());
     }
     public excuteRefreshRes(folder: string, url: string, appPath: string): boolean {
         if (!fs.existsSync(folder)) {
@@ -185,7 +189,9 @@ export class AppCommand {
         return true;
     }
     public excuteCreateApp(demension:string, folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, outputPath: string): boolean {
-
+        if(platform === PLATFORM_OHOS){
+            return this.tools.get(platform).excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, outputPath);
+        }
         if (type > 0 && !fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
             return false;

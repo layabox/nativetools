@@ -1,13 +1,15 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.unzipAsync = exports.unzip = exports.download = exports.getServerJSONConfig = exports.AppCommand = exports.WEBGLRENDERMODEJS = exports.DEMENSION_3D = exports.DEMENSION_2D = exports.H5_PROJECT_CONFIG_FILE = exports.PLATFORM_OHOS = exports.PLATFORM_ANDROID_STUDIO = exports.PLATFORM_ANDROID_ECLIPSE = exports.PLATFORM_IOS_WKWEBVIEW = exports.PLATFORM_IOS = exports.PLATFORM_ALL = exports.NATIVE_JSON_FILE_NAME = exports.DEFAULT_TYPE = exports.DEFAULT_PACKAGE_NAME = exports.DEFAULT_APP_NAME = exports.DEFAULT_NAME = exports.VERSION_CONFIG_URL = exports.STAND_ALONE_URL = void 0;
 const fs = require("fs");
 const path = require("path");
 const gen_dcc = require("layadcc");
@@ -15,6 +17,7 @@ const request = require("request");
 const child_process = require("child_process");
 const xmldom = require("xmldom");
 const ProgressBar = require("progress");
+const Ohos_1 = require("./Ohos");
 exports.STAND_ALONE_URL = 'http://stand.alone.version/index.html';
 exports.VERSION_CONFIG_URL = 'https://layabox.com/layaplayer/layanativeRes/versionconfig.json';
 exports.DEFAULT_NAME = 'LayaBox';
@@ -27,6 +30,7 @@ exports.PLATFORM_IOS = 'ios';
 exports.PLATFORM_IOS_WKWEBVIEW = 'wkwebview';
 exports.PLATFORM_ANDROID_ECLIPSE = 'android_eclipse';
 exports.PLATFORM_ANDROID_STUDIO = 'android_studio';
+exports.PLATFORM_OHOS = 'ohos';
 exports.H5_PROJECT_CONFIG_FILE = 'config.json';
 exports.DEMENSION_2D = '2D';
 exports.DEMENSION_3D = '3D';
@@ -99,6 +103,8 @@ function rmdirSync(dir) {
 ;
 class AppCommand {
     constructor() {
+        this.tools = new Map();
+        this.tools.set(exports.PLATFORM_OHOS, new Ohos_1.OhosTools());
     }
     excuteRefreshRes(folder, url, appPath) {
         if (!fs.existsSync(folder)) {
@@ -177,6 +183,9 @@ class AppCommand {
         return true;
     }
     excuteCreateApp(demension, folder, sdk, platform, type, url, name, app_name, package_name, outputPath) {
+        if (platform === exports.PLATFORM_OHOS) {
+            return this.tools.get(platform).excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, outputPath);
+        }
         if (type > 0 && !fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
             return false;
