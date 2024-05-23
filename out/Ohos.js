@@ -18,7 +18,7 @@ class OhosTools extends BaseTools {
     checkURL(url) {
         return true;
     }
-    excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, outputPath) {
+    excuteCreateApp(demension, folder, sdk, platform, type, url, name, app_name, package_name, outputPath) {
         if (type !== 2 && !this.checkURL(url)) {
             return false;
         }
@@ -60,6 +60,13 @@ class OhosTools extends BaseTools {
         let nativeJSON = { h5: folder ? folder : '' };
         FileUtils_1.FileUtils.mkdirsSync(path.dirname(nativeJSONPath));
         fs.writeFileSync(nativeJSONPath, JSON.stringify(nativeJSON));
+        if (demension === '3D') {
+            var configJsPath = path.join(appPath, 'entry/src/main/resources/rawfile/scripts/config.js');
+            var str = fs.readFileSync(configJsPath, 'utf-8');
+            str += "\n";
+            str += appCommand_1.WEBGLRENDERMODEJS;
+            fs.writeFileSync(configJsPath, str);
+        }
         return true;
     }
     excuteRefreshRes(folder, url, appPath) {

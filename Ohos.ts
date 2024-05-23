@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { AppCommand, STAND_ALONE_URL } from './appCommand';
+import { AppCommand, STAND_ALONE_URL, WEBGLRENDERMODEJS } from './appCommand';
 import { FileUtils } from './FileUtils';
 export abstract class BaseTools {
-    abstract excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, outputPath: string): boolean;
+    abstract excuteCreateApp(demension:string, folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, outputPath: string): boolean;
 
     abstract excuteRefreshRes(folder: string, url: string, appPath:string): boolean
     checkURL(url: string): boolean {
@@ -53,7 +53,7 @@ export class OhosTools extends BaseTools {
      * @param outputPath 导出项目存储路径
      * @returns 
      */
-    public excuteCreateApp(folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, outputPath: string): boolean {
+    public excuteCreateApp(demension:string, folder: string, sdk: string, platform: string, type: number, url: string, name: string, app_name: string, package_name: string, outputPath: string): boolean {
         if (type !== 2 && !this.checkURL(url)) {
             return false;
         }
@@ -104,6 +104,18 @@ export class OhosTools extends BaseTools {
         let nativeJSON = { h5: folder ? folder : ''};
         FileUtils.mkdirsSync( path.dirname(nativeJSONPath));
         fs.writeFileSync( nativeJSONPath, JSON.stringify(nativeJSON));
+
+
+        if (demension === '3D') {
+
+            var configJsPath = path.join(appPath, 'entry/src/main/resources/rawfile/scripts/config.js');
+            var str = fs.readFileSync(configJsPath, 'utf-8');
+            str += "\n";
+            str += WEBGLRENDERMODEJS;
+            fs.writeFileSync(configJsPath, str);
+            
+        }
+
         return true;
     } 
     

@@ -184,7 +184,7 @@ class AppCommand {
     }
     excuteCreateApp(demension, folder, sdk, platform, type, url, name, app_name, package_name, outputPath) {
         if (platform === exports.PLATFORM_OHOS) {
-            return this.tools.get(platform).excuteCreateApp(folder, sdk, platform, type, url, name, app_name, package_name, outputPath);
+            return this.tools.get(platform).excuteCreateApp(demension, folder, sdk, platform, type, url, name, app_name, package_name, outputPath);
         }
         if (type > 0 && !fs.existsSync(folder)) {
             console.log('错误: 找不到目录 ' + folder);
